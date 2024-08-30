@@ -14,10 +14,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import Drawer from '@mui/material/Drawer';
 import Navigation from './Navigation';
 import Logo from '../Images/Logo.png'
+import { getToken } from '../../services/localStorage'
+import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+
 function HideOnScroll(props) {
     const { children, window } = props;
     const trigger = useScrollTrigger({
@@ -36,7 +39,7 @@ HideOnScroll.propTypes = {
     window: PropTypes.func,
 };
 
-export default function HideAppBar(props) {
+export default function Navbar(props) {
     const pages = ['Home', 'explore', 'Shop'];
     const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -46,6 +49,12 @@ export default function HideAppBar(props) {
     const handleOpenNavMenu = () => {
         setDrawerOpen(true);
     };
+    let [access, setAccess] = React.useState(null)
+
+    useEffect(() => {
+        let { access_token, refresh_token } = getToken()
+        setAccess(access_token)
+    })
 
     const handleCloseNavMenu = () => {
         setDrawerOpen(false);
@@ -72,7 +81,6 @@ export default function HideAppBar(props) {
                 >
                     <Container maxWidth="xl">
                         <Toolbar disableGutters>
-                            {/* <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} src={Logo} component="img"></Box> */}
 
                             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                                 <IconButton
@@ -86,13 +94,16 @@ export default function HideAppBar(props) {
                                     <MenuIcon />
                                 </IconButton>
                             </Box>
-                            {/* <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} src={Logo} component="img"></Box> */}
 
+                            <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, width: '7vw' }} src={Logo} component="img"></Box>
                             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
                                 {pages.map((page) => (
 
                                     <Navigation name={page}
-                                        sx={{ my: 2, color: 'black', display: 'block' }}
+                                        sx={{
+                                            my: 2, color: 'black',
+                                            display: 'block'
+                                        }}
 
                                     />
                                 ))}
@@ -103,28 +114,54 @@ export default function HideAppBar(props) {
                                         <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
                                     </IconButton>
                                 </Tooltip>
-                                <Menu
-                                    sx={{ mt: '45px' }}
-                                    id="menu-appbar"
-                                    anchorEl={anchorElUser}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    keepMounted
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={Boolean(anchorElUser)}
-                                    onClose={handleCloseUserMenu}
-                                >
-                                    {settings.map((setting) => (
-                                        <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                            <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                                {access ?
+                                    <Menu
+                                        sx={{ mt: '45px' }}
+                                        id="menu-appbar"
+                                        anchorEl={anchorElUser}
+                                        anchorOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        keepMounted
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        open={Boolean(anchorElUser)}
+                                        onClose={handleCloseUserMenu}
+                                    >
+                                        {settings.map((setting) => (
+                                            <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                                <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                                            </MenuItem>
+                                        ))}
+                                    </Menu>
+                                    :
+
+                                    <Menu
+                                        sx={{ mt: '45px' }}
+                                        id="menu-appbar"
+                                        anchorEl={anchorElUser}
+                                        anchorOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        keepMounted
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        open={Boolean(anchorElUser)}
+                                        onClose={handleCloseUserMenu}
+                                    >
+                                        <MenuItem onClick={handleCloseUserMenu}>
+                                            <Typography sx={{ textAlign: 'center' }}>
+                                                <Link to='/gate'>Log In </Link></Typography>
                                         </MenuItem>
-                                    ))}
-                                </Menu>
+                                    </Menu>
+                                }
+
                             </Box>
                         </Toolbar>
                     </Container>
@@ -144,6 +181,7 @@ export default function HideAppBar(props) {
                     },
                 }}
             >
+                <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} src={Logo} component="img"></Box>
                 <Box
                     sx={{ width: 250 }}
                     role="presentation"
@@ -153,7 +191,7 @@ export default function HideAppBar(props) {
                     {pages.map((page) => (
                         <Box
                             sx={{
-                                width: '100%'
+                                width: '100%',
                             }}
                         >
                             <Navigation name={page} sx={{ my: 2, color: 'black', display: 'block' }} />

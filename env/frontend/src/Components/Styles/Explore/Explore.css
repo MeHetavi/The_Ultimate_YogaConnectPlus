@@ -1,0 +1,86 @@
+.scroll-container {
+    display: flex;
+    margin: auto;
+    overflow-x: auto;
+    padding: 1rem;
+    scroll-snap-type: x mandatory;
+    width: 85%;
+}
+
+.scroll-container::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar for Webkit browsers */
+}
+
+.profile-card {
+    flex: 0 0 auto;
+    width: 250px;
+    margin-right: 1rem;
+    scroll-snap-align: start;
+    display: 'flex';
+    text-align: center;
+    height: 20vh;
+    padding: 1%;
+}
+
+.profile-card:hover {
+    transform: scale(1.07);
+    transition: all 0.5s;
+}
+
+@media (max-width: 600px) {
+    .profile-card {
+        width: 150px;
+        /* Adjust card width for smaller screens */
+    }
+}
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    margin-top: 20vh;
+}
+
+.motion-search-bar {
+    display: flex;
+    align-items: center;
+    width: 80%;
+    margin-bottom: 1rem;
+    /* Ensure space for dropdown */
+}
+
+.search-input {
+    width: 100%;
+    border-radius: 30px !important;
+}
+
+.search-button {
+    margin-left: -48px;
+    /* Adjust margin to fit inside the text field */
+}
+
+.dropdown {
+    width: 80%;
+    margin-top: -1rem;
+    /* Align dropdown with search bar */
+}
+
+.dropdown-content {
+    width: 100%;
+    border-radius: 0 0 10px 10px;
+    /* Rounded bottom edges */
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .search-input {
+        width: 100%;
+    }
+
+    .dropdown,
+    .content {
+        width: 100%;
+    }
+}

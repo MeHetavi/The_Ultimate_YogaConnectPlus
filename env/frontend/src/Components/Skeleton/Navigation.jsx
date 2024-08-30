@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Link } from 'react-router-dom';
 
 const CustomButton = styled(Button)(({ theme }) => ({
     margin: '10px',
@@ -15,9 +16,9 @@ const CustomButton = styled(Button)(({ theme }) => ({
     '& span': {
         position: 'relative',
         zIndex: 1,
-        fontFamily: 'Ubuntu, sans-serif',
-        fontSize: '15px',
-        fontWeight: 700,
+
+        fontWeight: '400',
+        fontFamily: "Montserrat",
         letterSpacing: '0.05em',
         color: 'black',
     },
@@ -61,7 +62,27 @@ const CustomButton = styled(Button)(({ theme }) => ({
 export default function Navigation(props) {
     return (
         <CustomButton>
-            <span>{props.name}</span>
+            {
+                props.name.toLowerCase() == 'home' ?
+                    <span>
+                        <Link to={`/`}
+                            style={{
+                                textDecoration: 'none'
+                            }}
+                        >{props.name}
+                        </Link>
+                    </span>
+                    :
+                    <span>
+                        <Link to={`/${props.name.toLowerCase()}`}
+                            style={{
+                                textDecoration: 'none'
+                            }}
+                        >{props.name}
+                        </Link>
+                    </span>
+            }
+
         </CustomButton>
     );
 }
