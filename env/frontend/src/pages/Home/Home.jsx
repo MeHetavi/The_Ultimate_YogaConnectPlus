@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import Navbar from "../../Components/Skeleton/Navbar";
 import { Box, Typography } from "@mui/material";
 import Box1 from "../../Components/Home/Box1";
@@ -6,8 +6,12 @@ import Box2 from "../../Components/Home/Box2";
 import Box3 from "../../Components/Home/Box3";
 import Footer from "../../Components/Skeleton/Footer";
 import Box4 from "../../Components/Home/Box4";
-
+import Box5 from '../../Components/Home/Box5';
+import Box6 from '../../Components/Home/Box6';
+import Box7 from '../../Components/Home/Box7';
+import Box8 from '../../Components/Home/Box8';
 export default function Home() {
+
     return (
         <>
             <Navbar />
@@ -20,21 +24,21 @@ export default function Home() {
                 <Box
                     sx={{
                         display: 'flex',
-                        height: '70vh',
+                        height: '75vh',
                         width: '70vw',
                         margin: '2px'
                     }}>
                     <Box2 />
-
                 </Box>
+
                 <Box
                     sx={{
-                        height: '70vh',
+                        height: '75vh',
                         width: '20vw',
                         margin: '2px'
 
-                    }}>
-
+                    }}
+                >
                     <Box
                         sx={{
                             display: 'flex',
@@ -49,7 +53,7 @@ export default function Home() {
                     <Box
                         sx={{
                             display: 'flex',
-                            height: '25vh',
+                            height: '30vh',
                             width: '25vw',
                             margin: '2px',
                             marginTop: '10vh',
@@ -91,7 +95,7 @@ export default function Home() {
                             width: '65vw',
                             margin: '10px',
                         }}>
-                        <Box3 />
+                        <Box5 />
                     </Box>
 
                     <Box
@@ -101,7 +105,7 @@ export default function Home() {
                             width: '30vw',
                             margin: '10px',
                         }}>
-                        <Box3 />
+                        <Box6 />
                     </Box>
                 </Box>
             </Box>
@@ -122,7 +126,7 @@ export default function Home() {
                         margin: '10px',
                         // marginLeft: '2vw'
                     }}>
-                    <Box3 />
+                    <Box7 />
                 </Box>
                 <Box
                     sx={{
@@ -130,7 +134,7 @@ export default function Home() {
                         width: '25vw',
                         margin: '10px',
                     }}>
-                    <Box3 />
+                    <Box8 />
 
                 </Box>
             </Box>

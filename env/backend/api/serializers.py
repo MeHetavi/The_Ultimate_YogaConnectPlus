@@ -33,7 +33,7 @@ class SignInSerializer(serializers.ModelSerializer):
 class PersonDashboardSerializer(serializers.ModelSerializer):
   class Meta:
     model = Person
-    fields = ['username', 'email', 'name', 'age', 'gender','is_trainer','followers','following','trainees','posts']
+    fields = ['username', 'email', 'name', 'age', 'gender','is_trainer','trainees']
 
 class GetAllUsersSeializer(serializers.ModelSerializer) :
   class Meta:

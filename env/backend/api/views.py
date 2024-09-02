@@ -54,20 +54,10 @@ class SignIn(APIView):
 class Dashboard(APIView):
     renderer_classes = [PersonRenderer]
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, format=None):
-        
         person_serializer = PersonDashboardSerializer(request.user)
         data = person_serializer.data
-        followers = []
-        for num in person_serializer.data['followers']:
-            followers.append(str(Person.objects.get(id=num)))
-        data.update({ 'followers' : followers })
-        
-        following = []
-        for num in person_serializer.data['following']:
-            following.append(str(Person.objects.get(id=num)))
-        data.update({'following' : following})
         
 
         print(person_serializer.data)

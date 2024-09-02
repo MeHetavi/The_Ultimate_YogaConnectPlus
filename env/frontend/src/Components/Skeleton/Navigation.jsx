@@ -74,7 +74,7 @@ export default function Navigation(props) {
                     </span>
                     :
                     <span>
-                        <Link to={`/${props.name.toLowerCase()}`}
+                        <Link to={`${props.link}`}
                             style={{
                                 textDecoration: 'none'
                             }}

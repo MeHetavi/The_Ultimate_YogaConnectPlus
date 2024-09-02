@@ -40,8 +40,12 @@ HideOnScroll.propTypes = {
 };
 
 export default function Navbar(props) {
-    const pages = ['Home', 'explore', 'Shop'];
-    const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+    const pages = [
+        { name: 'Home', link: '/' },
+        { name: 'explore', link: '/explore' },
+        { name: 'Shop', link: '/shop' }
+    ];
+    const settings = ['Dashboard', 'Logout'];
 
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -99,12 +103,11 @@ export default function Navbar(props) {
                             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
                                 {pages.map((page) => (
 
-                                    <Navigation name={page}
+                                    <Navigation name={page.name} link={page.link}
                                         sx={{
                                             my: 2, color: 'black',
                                             display: 'block'
                                         }}
-
                                     />
                                 ))}
                             </Box>
@@ -133,12 +136,13 @@ export default function Navbar(props) {
                                     >
                                         {settings.map((setting) => (
                                             <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                                <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                                                <Typography sx={{ textAlign: 'center' }}>
+                                                    <Link to={`/${setting.toLowerCase()}`}>{setting}</Link>
+                                                </Typography>
                                             </MenuItem>
                                         ))}
                                     </Menu>
                                     :
-
                                     <Menu
                                         sx={{ mt: '45px' }}
                                         id="menu-appbar"
@@ -194,7 +198,8 @@ export default function Navbar(props) {
                                 width: '100%',
                             }}
                         >
-                            <Navigation name={page} sx={{ my: 2, color: 'black', display: 'block' }} />
+                            <Navigation name={page.name} link={page.link}
+                                sx={{ my: 2, color: 'black', display: 'block' }} />
                         </Box>
 
                     ))}

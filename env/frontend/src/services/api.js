@@ -33,7 +33,7 @@ export const api = createApi({
         }),
 
         getLoggedUser: builder.query({
-            query: (access_token) => {
+            query: ({ access_token }) => {
                 return {
                     url: 'dashboard/',
                     method: 'GET',

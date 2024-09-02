@@ -1,24 +1,19 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { keyframes } from '@mui/system';
-
-// Keyframes for moving waves
-const moveWaves = keyframes`
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 100%;
-  }
-`;
+import { useNavigate } from 'react-router-dom';
 
 const Box3 = () => {
+    const navigate = useNavigate();
+
+    const navigateToExplore = () => {
+        navigate('/Explore')
+    }
     return (
         <Box
             sx={{
                 width: 'inherit',
                 height: 'inherit',
-                backgroundColor: '#3b7789', // Light blue background color
+                backgroundColor: '#3b7789',
                 borderRadius: '20px',
                 display: 'flex',
                 flexDirection: 'column',
@@ -47,19 +42,24 @@ const Box3 = () => {
                 variant="contained"
                 sx={{
                     fontWeight: '500',
-                    color: '#323232',
                     fontFamily: "Montserrat",
                     fontSize: '20px',
-                    mt: 4,
-                    backgroundColor: '#fff',
-                    color: '#323232',
                     borderRadius: '50px',
                     textTransform: 'none',
                     padding: '8px 16px',
+                    bgcolor: '#8acfe3',
+                    color: '#000',
                     '&:hover': {
-                        backgroundColor: '#f5f5f5',
+                        transform: 'translate(-0.25rem, -0.25rem)',
+                        boxShadow: '0.25rem 0.25rem #000000'
                     },
+                    '&:active': {
+                        transform: 'translate(0)',
+                        boxShadow: 'none'
+                    }
                 }}
+                onClick={navigateToExplore}
+            // className='btn'
             >
                 Find Your Yoga Style
             </Button>

@@ -1,35 +1,51 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
-import { keyframes } from '@mui/system';
-// Keyframes for moving waves
-const moveWaves = keyframes`
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 100%;
-  }
-`;
+import { Box, Typography } from '@mui/material';
+import Yoga1 from '../Images/Yoga1.jpg';
+import '../Styles/Home/Box4.css';
 
 const Box4 = () => {
+
   return (
     <Box
       sx={{
         width: 'inherit',
         height: 'inherit',
-        backgroundColor: '#D9E7FD', // Light blue background color
+        backgroundColor: '#acd6e2', // Light blue background color
         borderRadius: '20px',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-        display: 'flex'
-
+        // flexDirection: 'column',
+        // alignItems: 'center',
+        justifyContent: 'space-between',
+        // position: 'relative',
       }}
     >
 
+      <Box>
+        <Typography
+          variant="h2"
+          sx={{
+            fontWeight: '200',
+            fontFamily: "Montserrat",
+            p: 5,
+          }}
+        >
+          Connect Deeper,
+          <  br />
+          Practice Stronger,
+          <  br />
+          Live Better With YC+
+        </Typography>
+      </Box>
+
+      <img src={Yoga1} alt="" className='revealing-image'
+        style={{
+          width: '30vw',
+          height: 'fit-content',
+          borderRadius: '50px',
+          justifySelf: 'end',
+          margin: 20,
+        }}
+      />
     </Box>
   );
 };

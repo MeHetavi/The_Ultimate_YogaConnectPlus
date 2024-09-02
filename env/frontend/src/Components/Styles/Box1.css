@@ -22,19 +22,11 @@
     height: 25px;
     position: relative;
     color: var(--clr);
-    background-color: #fff;
+    background-color: #acd6e2;
     border-radius: 50%;
     display: grid;
     place-items: center;
     overflow: hidden;
-}
-
-.button:hover {
-    background-color: #07675a;
-}
-
-.button:hover .button__icon-wrapper {
-    color: #07675a;
 }
 
 .button__icon-svg--copy {
