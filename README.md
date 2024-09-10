@@ -13,3 +13,4 @@ npm install @mui/icons-material
 npm install @reduxjs/toolkit
 npm install react-redux
 npm i framer-motion
+npm i gsap

@@ -20,6 +20,9 @@ import Logo from '../Images/Logo.png'
 import { getToken } from '../../services/localStorage'
 import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import CartButton from './CartButton';
+import WishlistButton from './WishlistButton';
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -42,10 +45,13 @@ HideOnScroll.propTypes = {
 export default function Navbar(props) {
     const pages = [
         { name: 'Home', link: '/' },
-        { name: 'explore', link: '/explore' },
+        { name: 'Explore', link: '/explore' },
         { name: 'Shop', link: '/shop' }
     ];
-    const settings = ['Dashboard', 'Logout'];
+    const settings = [
+        { name: 'Dashboard', link: '/dashboard' },
+        { name: 'Log Out', link: '/' },
+    ];
 
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -53,12 +59,15 @@ export default function Navbar(props) {
     const handleOpenNavMenu = () => {
         setDrawerOpen(true);
     };
-    let [access, setAccess] = React.useState(null)
+
+    let [access, setAccess] = React.useState(null);
+    const user = useSelector((state) => state.user);
+    console.log(user);
 
     useEffect(() => {
-        let { access_token, refresh_token } = getToken()
-        setAccess(access_token)
-    })
+        let { access_token, refresh_token } = getToken();
+        setAccess(access_token);
+    }, []); // Empty dependency array to ensure it only runs once on mount
 
     const handleCloseNavMenu = () => {
         setDrawerOpen(false);
@@ -81,11 +90,12 @@ export default function Navbar(props) {
                         backgroundColor: 'inherit',
                         color: 'black',
                         boxShadow: 'none',  // Remove shadow
+                        width: '100vw',
                     }}
                 >
                     <Container maxWidth="xl">
                         <Toolbar disableGutters>
-
+                            {/* Mobile Menu Icon */}
                             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                                 <IconButton
                                     size="large"
@@ -99,79 +109,80 @@ export default function Navbar(props) {
                                 </IconButton>
                             </Box>
 
-                            <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 1, width: '7vw' }} src={Logo} component="img"></Box>
-                            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
-                                {pages.map((page) => (
+                            {/* Logo */}
+                            <Box sx={{ display: { xs: 'none', md: 'flex' }, width: '7vw' }} src={Logo} component="img"></Box>
 
+                            {/* Centered Navigation Links */}
+                            <Box
+                                sx={{
+                                    flexGrow: 1,
+                                    display: { xs: 'none', md: 'flex' },
+                                    justifySelf: 'center',
+                                    justifyContent: 'center'
+                                }}>
+
+                                {pages.map((page) => (
                                     <Navigation name={page.name} link={page.link}
                                         sx={{
-                                            my: 2, color: 'black',
+                                            color: 'black',
                                             display: 'block'
                                         }}
                                     />
                                 ))}
+
                             </Box>
-                            <Box sx={{ flexGrow: 0 }}>
+
+                            {/* User Settings Avatar */}
+                            <Box sx={{
+                                flexGrow: 0,
+                                display: 'flex'
+                            }}>
+                                <WishlistButton />
+                                <CartButton></CartButton>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                                        <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
                                     </IconButton>
                                 </Tooltip>
-                                {access ?
-                                    <Menu
-                                        sx={{ mt: '45px' }}
-                                        id="menu-appbar"
-                                        anchorEl={anchorElUser}
-                                        anchorOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'right',
-                                        }}
-                                        keepMounted
-                                        transformOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'right',
-                                        }}
-                                        open={Boolean(anchorElUser)}
-                                        onClose={handleCloseUserMenu}
-                                    >
-                                        {settings.map((setting) => (
-                                            <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                <Menu
+                                    sx={{ mt: '45px' }}
+                                    id="menu-appbar"
+                                    anchorEl={anchorElUser}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={Boolean(anchorElUser)}
+                                    onClose={handleCloseUserMenu}
+                                >
+                                    {user.username ?
+                                        settings.map((setting) => (
+                                            <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
                                                 <Typography sx={{ textAlign: 'center' }}>
-                                                    <Link to={`/${setting.toLowerCase()}`}>{setting}</Link>
+                                                    <Link to={setting.link}>{setting.name}</Link>
                                                 </Typography>
                                             </MenuItem>
-                                        ))}
-                                    </Menu>
-                                    :
-                                    <Menu
-                                        sx={{ mt: '45px' }}
-                                        id="menu-appbar"
-                                        anchorEl={anchorElUser}
-                                        anchorOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'right',
-                                        }}
-                                        keepMounted
-                                        transformOrigin={{
-                                            vertical: 'top',
-                                            horizontal: 'right',
-                                        }}
-                                        open={Boolean(anchorElUser)}
-                                        onClose={handleCloseUserMenu}
-                                    >
+                                        ))
+                                        :
                                         <MenuItem onClick={handleCloseUserMenu}>
                                             <Typography sx={{ textAlign: 'center' }}>
-                                                <Link to='/gate'>Log In </Link></Typography>
+                                                <Link to='/gate'>Log In </Link>
+                                            </Typography>
                                         </MenuItem>
-                                    </Menu>
-                                }
-
+                                    }
+                                </Menu>
                             </Box>
                         </Toolbar>
                     </Container>
                 </AppBar>
             </HideOnScroll>
 
+            {/* Drawer for Mobile View */}
             <Drawer
                 anchor="left"
                 open={drawerOpen}
@@ -185,7 +196,10 @@ export default function Navbar(props) {
                     },
                 }}
             >
+                {/* Drawer Logo */}
                 <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} src={Logo} component="img"></Box>
+
+                {/* Drawer Navigation Links */}
                 <Box
                     sx={{ width: 250 }}
                     role="presentation"
@@ -193,19 +207,13 @@ export default function Navbar(props) {
                     onKeyDown={handleCloseNavMenu}
                 >
                     {pages.map((page) => (
-                        <Box
-                            sx={{
-                                width: '100%',
-                            }}
-                        >
+                        <Box key={page.name} sx={{ width: '100%' }}>
                             <Navigation name={page.name} link={page.link}
                                 sx={{ my: 2, color: 'black', display: 'block' }} />
                         </Box>
-
                     ))}
                 </Box>
             </Drawer>
-
         </React.Fragment>
     );
 }

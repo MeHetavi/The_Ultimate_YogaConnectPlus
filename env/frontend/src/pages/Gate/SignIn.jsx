@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import FlipCardSide from "../../Components/Gate/FlipCardSide.jsx";
 import { Typography } from "@mui/material";
 import FormInput from "../../Components/Gate/FormInput.jsx";
@@ -10,9 +11,9 @@ import { Alert } from "@mui/material";
 
 export default function SignIn() {
     const [server_error, setServerError] = useState({})
-
     const navigate = useNavigate();
     const [loginUser] = useLoginUserMutation()
+    const [token, setToken] = React.useState(null);
 
     const handleSignInSubmit = async (e) => {
         e.preventDefault();
@@ -33,6 +34,8 @@ export default function SignIn() {
 
         if (res.data) {
             storeToken(res.data.token);
+            setToken(res.data.token);
+
             navigate('/');
         }
     }

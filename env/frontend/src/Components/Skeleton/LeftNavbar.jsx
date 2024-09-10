@@ -2,7 +2,7 @@ import { Box, LinearProgress, Avatar, List, ListItem, ListItemText } from '@mui/
 import Navigation from "./Navigation"
 export default function LeftNavbar() {
 
-    const navigateTo = ['Dashboard', 'Progress', 'Subscribe', 'Logout', 'Subscribe', 'Logout', 'Subscribe']
+    const navigateTo = ['Dashboard', 'Progress', 'Subscribe', 'Logout']
 
     return (
         <Box

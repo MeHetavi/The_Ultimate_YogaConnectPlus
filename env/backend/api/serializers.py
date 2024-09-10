@@ -16,7 +16,10 @@ class PersonRegistrationSerializer(serializers.ModelSerializer):
 
     password = attrs.get('password')
     password2 = attrs.get('password2')
-    
+    username = attrs.get('username')
+    if " " in username:
+      raise serializers.ValidationError("No spaces are allowed in username.")
+
     if password != password2:
       raise serializers.ValidationError("Password and Confirm Password doesn't match")
     return attrs

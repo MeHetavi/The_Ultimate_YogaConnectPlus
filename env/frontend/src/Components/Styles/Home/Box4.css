@@ -23,5 +23,5 @@
     /* animation-range: entry 25% cover 50%; */
     animation: reveal linear both;
     animation-timeline: view(block);
-    animation-range: cover 0% cover 40%;
+    animation-range: cover 0% cover 50%;
 }

@@ -46,7 +46,6 @@ export default function Shop() {
                 >
                     {genere.map((item) => (
                         <Genere name={item.name} link={item.link}></Genere>
-
                     ))}
                 </Box>
             </Box>

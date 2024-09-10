@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import Yoga1 from '../Images/Yoga1.jpg';
+import Yoga1 from '../Images/Home1.jpg';
 import '../Styles/Home/Box4.css';
 
 const Box4 = () => {
@@ -41,7 +41,7 @@ const Box4 = () => {
         style={{
           width: '30vw',
           height: 'fit-content',
-          borderRadius: '50px',
+          borderRadius: '30px',
           justifySelf: 'end',
           margin: 20,
         }}

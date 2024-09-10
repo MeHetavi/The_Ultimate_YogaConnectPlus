@@ -11,7 +11,7 @@ class PersonManager(BaseUserManager):
         """
         if not email:
             raise ValueError("Users must have an email address")
-
+        
         user = self.model(
             username=username,
             email=self.normalize_email(email),

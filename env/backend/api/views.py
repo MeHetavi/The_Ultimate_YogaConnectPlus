@@ -59,7 +59,6 @@ class Dashboard(APIView):
         person_serializer = PersonDashboardSerializer(request.user)
         data = person_serializer.data
         
-
         print(person_serializer.data)
         return Response(data, status=status.HTTP_200_OK)
 

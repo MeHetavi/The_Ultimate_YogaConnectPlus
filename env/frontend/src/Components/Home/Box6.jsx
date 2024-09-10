@@ -12,8 +12,8 @@ const Box6 = () => {
                 borderRadius: '20px',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
+                alignItems: 'end',
+                justifyContent: 'end',
                 position: 'relative',
                 overflow: 'hidden',
                 marginTop: '5vh',
@@ -21,17 +21,41 @@ const Box6 = () => {
 
             }}
         >
+            <Typography variant="h2"
+                sx={{
+                    fontWeight: '100',
+                    color: '#000',
+                    fontFamily: "Montserrat",
+                    p: 2,
+                    textAlign: 'end'
+                }}
+            >
+
+                Guide others on their path to wellness.
+                <br />
+                <Typography
+                    variant="h5"
+                    sx={{
+                        fontWeight: '400',
+                        color: '#000',
+                        fontFamily: "Montserrat",
+                        textAlign: 'center',
+                    }}
+                >
+                    Make your mark as a YC+ trainer.
+                </Typography>
+            </Typography>
+
             <Typography variant="h3"
                 sx={{
-                    fontWeight: '300',
-                    color: '#fff',
+                    fontWeight: '200',
+                    color: '#000',
                     fontFamily: "Montserrat",
-                    fontSize: '30px',
-                    p: 2
+                    p: 2,
+                    textAlign: 'center'
                 }}
             >
             </Typography>
-
         </Box>
     );
 };

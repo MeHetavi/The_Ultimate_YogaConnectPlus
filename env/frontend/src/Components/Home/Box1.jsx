@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import '../Styles/Box1.css'
+import '../Styles/Home/Box1.css'
 
 const WaveCard = () => {
     return (

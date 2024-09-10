@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 
 const CustomButton = styled(Button)(({ theme }) => ({
-    margin: '10px',
+    margin: '20px',
     position: 'relative',
     padding: '12px 20px',  // Reduce padding if needed
     transition: 'all 0.2s ease',
@@ -16,7 +16,6 @@ const CustomButton = styled(Button)(({ theme }) => ({
     '& span': {
         position: 'relative',
         zIndex: 1,
-
         fontWeight: '400',
         fontFamily: "Montserrat",
         letterSpacing: '0.05em',

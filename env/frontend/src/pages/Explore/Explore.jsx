@@ -109,7 +109,7 @@ const Explore = () => {
                                             fontSize: '15px',
                                         }}
                                     >
-                                        <Link to={`profile/${profile.username}`}>{profile.username}</Link>
+                                        <Link to={`/profile/${profile.username}`}>{profile.username}</Link>
                                     </Typography>
                                     <Typography
                                         sx={{

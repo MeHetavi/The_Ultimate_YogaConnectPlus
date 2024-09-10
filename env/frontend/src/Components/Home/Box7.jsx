@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-
+import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 const Box7 = () => {
 
     return (
@@ -12,24 +12,35 @@ const Box7 = () => {
                 borderRadius: '20px',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
                 overflow: 'hidden',
                 marginTop: '5vh',
-                display: 'flex'
+                display: 'flex',
+                p: 2
 
             }}
         >
-            <Typography variant="h3"
+
+            <Typography variant="h4"
                 sx={{
-                    fontWeight: '300',
+                    fontWeight: '100',
                     color: '#fff',
                     fontFamily: "Montserrat",
-                    fontSize: '30px',
-                    p: 2
                 }}
             >
+                "Find the perfect plan to elevate your training journey."
+                <Typography
+                    variant="h5"
+                    sx={{
+                        fontWeight: '300',
+                        color: '#000',
+                        fontFamily: "Montserrat",
+                        textAlign: 'start',
+                    }}
+                >
+                    Join YC+ today
+                </Typography>
             </Typography>
 
 

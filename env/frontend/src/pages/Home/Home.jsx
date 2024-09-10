@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from "../../Components/Skeleton/Navbar";
 import { Box, Typography } from "@mui/material";
 import Box1 from "../../Components/Home/Box1";
@@ -10,7 +10,35 @@ import Box5 from '../../Components/Home/Box5';
 import Box6 from '../../Components/Home/Box6';
 import Box7 from '../../Components/Home/Box7';
 import Box8 from '../../Components/Home/Box8';
+import { useGetLoggedUserQuery } from "../../services/api.js";
+import { useDispatch } from "react-redux";
+import { setUserInfo } from '../../features/userSlice.js';
+import { getToken } from '../../services/localStorage.js';
+
 export default function Home() {
+    const [token, setToken] = React.useState(getToken());
+
+    const dispatch = useDispatch();
+
+    const { data, isSuccess } = useGetLoggedUserQuery({ access_token: token.access_token });
+
+    useEffect(() => {
+        if (data && token) {
+            dispatch(setUserInfo({
+                username: data.username,
+                email: data.email,
+                name: data.name,
+                age: data.age,
+                gender: data.gender,
+                is_trainer: data.is_trainer,
+                followers: data.followers,
+                following: data.following,
+                trainees: data.trainees,
+                posts: data.posts,
+            }))
+        }
+    }, [data, token])
+
 
     return (
         <>
@@ -113,7 +141,7 @@ export default function Home() {
             <Box
                 sx={{
                     height: '70vh',
-                    margin: '10px',
+                    margin: '20px',
                     position: 'relative',
                     top: '-50vh',
                     display: 'flex'
@@ -122,7 +150,7 @@ export default function Home() {
                 <Box
                     sx={{
                         height: '41.3vh',
-                        width: '38vw',
+                        width: '39vw',
                         margin: '10px',
                         // marginLeft: '2vw'
                     }}>

@@ -1,0 +1,40 @@
+User authentication
+
+Dashboard
+ -User details(Name, age, gender)
+ -Streak progress bar (get points on attending sessions everyday)
+ -Diet plan if any
+ -Previous sessions
+ -Add/Delete posts
+ -Add story
+ -Start a session
+ -Provide diet plan
+ -Badges/ Achievements/ leaderboards
+
+Home
+ -Search bar
+ -Skeleton
+ -Animations
+ -Details
+
+Explore
+ -Search bar
+ -Top trainers(join sessions, become trainee,...)
+ -Random posts(like, dislike, comments)
+
+Live Sessions
+ -Video and audio transmission
+ -Live chat
+ -Search bar
+ -Display ongoing sessions
+ -Contests
+
+Ongoing/upcoming events
+ -Registration
+ -...
+
+Help
+ -Chatbot
+
+Community
+Recorded sessions
