@@ -101,5 +101,6 @@ class UpdateProfile(APIView):
             user = serializer.save()
             response_data = serializer.data
             response_data['password_updated'] = 'password' in request.data
+            response_data['avatar_removed'] = 'remove_avatar' in request.data and request.data['remove_avatar']
             return Response(response_data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,0 +1,1 @@
+Make explore page scroll sec into grid

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Card, CardContent, Button, Avatar, ThemeProvider, createTheme, CircularProgress, Modal, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Navbar from '../../Components/Skeleton/Navbar';
@@ -8,26 +8,23 @@ import { useSelector } from 'react-redux';
 import { useGetLoggedUserQuery } from '../../services/api';
 import { getToken } from '../../services/localStorage';
 
+// Configuration
+const API_BASE_URL = '';  // Adjust this to match your backend URL
+
 const theme = createTheme({
     typography: {
         fontFamily: 'Montserrat, sans-serif',
     },
 });
 
+
 const Settings = () => {
     const { access_token, refresh_token } = getToken();
-    const [user, setUser] = useState(useSelector((state) => state.user));
+    const user = useSelector((state) => state.user);
     const [isLoading, setIsLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
-    const { data, isSuccess } = useGetLoggedUserQuery({ access_token });
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
-
-    useEffect(() => {
-        if (isSuccess) {
-            setUser(data);
-        }
-    }, [isSuccess, data]);
 
     return (
         <ThemeProvider theme={theme}>

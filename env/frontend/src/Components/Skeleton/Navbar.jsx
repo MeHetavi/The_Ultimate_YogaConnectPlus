@@ -85,13 +85,8 @@ export default function Navbar(props) {
     };
 
     let [access_token, setAccess] = React.useState(null);
-    const { data, isSuccess } = useGetLoggedUserQuery({ access_token });
-    const [user, setUser] = useState(useSelector((state) => state.user));
-    useEffect(() => {
-        if (isSuccess) {
-            setUser(data);
-        }
-    }, [isSuccess, data]);
+    const user = useSelector((state) => state.user);
+
 
     useEffect(() => {
         let { access_token, refresh_token } = getToken();
@@ -199,7 +194,7 @@ export default function Navbar(props) {
                                 <CartButton></CartButton>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                                        <Avatar alt="User Avatar" src={user.avatar} />
                                     </IconButton>
                                 </Tooltip>
                                 <Menu

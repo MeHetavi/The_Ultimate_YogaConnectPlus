@@ -54,7 +54,7 @@ class Person(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    avatar = models.ImageField(upload_to='avatars', null=True, blank=True)
     trainees = models.ManyToManyField('self',symmetrical=False, related_name='trainee_set')
 
     objects = PersonManager()
@@ -90,5 +90,5 @@ class Person(AbstractBaseUser):
 #     image = models.ImageField(upload_to='products/', null=False, blank=False)
 #     wishlistedBy = models.ManyToManyField('self',symmetrical=False, related_name='Wishlist')
 #     addedToCartBy = models.ManyToManyField('self',symmetrical=False, related_name='Cart')
-#     colors = models.ManyToManyField('self',symmetrical=False, related_name='Colors')
+# #   colors = models.ManyToManyField('self',symmetrical=False, related_name='Colors')
 #     category = models.CharField(max_length=100)

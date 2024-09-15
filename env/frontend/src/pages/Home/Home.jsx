@@ -35,6 +35,7 @@ export default function Home() {
                 following: data.following,
                 trainees: data.trainees,
                 posts: data.posts,
+                avatar: data.avatar
             }))
         }
     }, [data, token])

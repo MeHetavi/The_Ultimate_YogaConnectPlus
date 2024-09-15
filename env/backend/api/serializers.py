@@ -37,7 +37,7 @@ class SignInSerializer(serializers.ModelSerializer):
 class PersonDashboardSerializer(serializers.ModelSerializer):
   class Meta:
     model = Person
-    fields = ['username', 'email', 'name', 'age', 'gender','is_trainer','trainees']
+    fields = ['username', 'email', 'name', 'age', 'gender','is_trainer','trainees','avatar']
 
 class GetAllUsersSeializer(serializers.ModelSerializer) :
   class Meta:
@@ -47,11 +47,12 @@ class GetAllUsersSeializer(serializers.ModelSerializer) :
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
     old_password = serializers.CharField(write_only=True, required=False)
-    avatar = serializers.ImageField(required=False)
+    # avatar = serializers.ImageField(required=False, allow_null=True)
+    remove_avatar = serializers.BooleanField(required=False, write_only=True)
 
     class Meta:
         model = Person
-        fields = ['name', 'age', 'gender', 'email', 'username', 'password', 'old_password', 'avatar']
+        fields = ['name', 'age', 'gender', 'email', 'username', 'password', 'old_password', 'avatar', 'remove_avatar']
 
     def validate_email(self, value):
         user = self.instance
@@ -72,7 +73,6 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"old_password": "Old password is required to set a new password."})
             if not self.instance.check_password(old_password):
                 raise serializers.ValidationError({"old_password": "Old password is incorrect."})
-            
             password = attrs['password']
             try:
                 validate_password(password, self.instance)
@@ -84,12 +84,19 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
         old_password = validated_data.pop('old_password', None)
-        
+        remove_avatar = validated_data.pop('remove_avatar', False)
+        print(remove_avatar)
         for attr, value in validated_data.items():
+            print(attr, value)
             setattr(instance, attr, value)
         
         if password:
             instance.set_password(password)
+        
+        if validated_data.get('remove_avatar', False):
+            instance.avatar = ''
+        elif 'avatar' in validated_data:
+            instance.avatar = validated_data['avatar']
         
         instance.save()
         return instance

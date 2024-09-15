@@ -14,3 +14,4 @@ npm install @reduxjs/toolkit
 npm install react-redux
 npm i framer-motion
 npm i gsap
+npm install react-easy-crop
