@@ -1,8 +1,15 @@
-import { Box, LinearProgress, Avatar, List, ListItem, ListItemText } from '@mui/material';
+import { Box } from '@mui/material';
 import Navigation from "./Navigation"
+
 export default function LeftNavbar() {
 
-    const navigateTo = ['Dashboard', 'Progress', 'Subscribe', 'Logout']
+    const navigateTo = [
+
+        { name: 'Dashboard', link: '/dashboard' },
+        { name: 'Edit', link: '/updateProfile' },
+        { name: 'Progress', link: '/progress' },
+        { name: 'Subscribe', link: '/subscribe' },
+    ]
 
     return (
         <Box
@@ -17,7 +24,7 @@ export default function LeftNavbar() {
             }}
         >
             {navigateTo.map((page) => (
-                <Navigation name={page}
+                <Navigation name={page.name} link={page.link}
                     sx={{
                         my: 2, color: 'black',
                         display: 'block'

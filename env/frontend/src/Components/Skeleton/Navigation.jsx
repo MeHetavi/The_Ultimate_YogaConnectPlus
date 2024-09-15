@@ -62,24 +62,14 @@ export default function Navigation(props) {
     return (
         <CustomButton>
             {
-                props.name.toLowerCase() == 'home' ?
-                    <span>
-                        <Link to={`/`}
-                            style={{
-                                textDecoration: 'none'
-                            }}
-                        >{props.name}
-                        </Link>
-                    </span>
-                    :
-                    <span>
-                        <Link to={`${props.link}`}
-                            style={{
-                                textDecoration: 'none'
-                            }}
-                        >{props.name}
-                        </Link>
-                    </span>
+                <span>
+                    <Link to={`${props.link}`}
+                        style={{
+                            textDecoration: 'none'
+                        }}
+                    >{props.name}
+                    </Link>
+                </span>
             }
 
         </CustomButton>

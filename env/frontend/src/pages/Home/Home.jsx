@@ -38,7 +38,7 @@ export default function Home() {
             }))
         }
     }, [data, token])
-
+    console.log(data)
 
     return (
         <>

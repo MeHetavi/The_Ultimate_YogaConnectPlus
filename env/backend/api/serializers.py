@@ -1,5 +1,6 @@
 from rest_framework import serializers 
 from .models import Person
+from django.contrib.auth.password_validation import validate_password
 
 class PersonRegistrationSerializer(serializers.ModelSerializer):
   # We are writing this becoz we need confirm password field in our Registratin Request
@@ -42,4 +43,54 @@ class GetAllUsersSeializer(serializers.ModelSerializer) :
   class Meta:
     model = Person
     fields = ['username', 'email', 'name','is_trainer','trainees']
+
+class UpdateUserProfileSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+    old_password = serializers.CharField(write_only=True, required=False)
+    avatar = serializers.ImageField(required=False)
+
+    class Meta:
+        model = Person
+        fields = ['name', 'age', 'gender', 'email', 'username', 'password', 'old_password', 'avatar']
+
+    def validate_email(self, value):
+        user = self.instance
+        if Person.objects.exclude(pk=user.pk).filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
+
+    def validate_username(self, value):
+        user = self.instance
+        if Person.objects.exclude(pk=user.pk).filter(username=value).exists():
+            raise serializers.ValidationError("This username is already in use.")
+        return value
+
+    def validate(self, attrs):
+        if 'password' in attrs:
+            old_password = attrs.get('old_password')
+            if not old_password:
+                raise serializers.ValidationError({"old_password": "Old password is required to set a new password."})
+            if not self.instance.check_password(old_password):
+                raise serializers.ValidationError({"old_password": "Old password is incorrect."})
+            
+            password = attrs['password']
+            try:
+                validate_password(password, self.instance)
+            except serializers.ValidationError as e:
+                raise serializers.ValidationError({"password": list(e.messages)})
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        old_password = validated_data.pop('old_password', None)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        if password:
+            instance.set_password(password)
+        
+        instance.save()
+        return instance
 

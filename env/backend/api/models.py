@@ -49,6 +49,7 @@ class Person(AbstractBaseUser):
     name = models.CharField(max_length=100)
     age = models.PositiveIntegerField()
     gender = models.CharField(max_length=10)
+    # description = models.CharField(max_length=1000)
     is_trainer = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -83,3 +84,11 @@ class Person(AbstractBaseUser):
         "Is the user a member of staff?"
         return self.is_admin
 
+# class Product(models.Model):
+#     name = models.CharField(max_length=100)
+#     price = models.IntegerField()
+#     image = models.ImageField(upload_to='products/', null=False, blank=False)
+#     wishlistedBy = models.ManyToManyField('self',symmetrical=False, related_name='Wishlist')
+#     addedToCartBy = models.ManyToManyField('self',symmetrical=False, related_name='Cart')
+#     colors = models.ManyToManyField('self',symmetrical=False, related_name='Colors')
+#     category = models.CharField(max_length=100)

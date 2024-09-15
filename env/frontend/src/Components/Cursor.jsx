@@ -81,7 +81,7 @@ export default function AnimatedCursor({
             height: innerSize,
             pointerEvents: "none",
             backgroundColor: `rgba(${color}, 1)`,
-            zIndex: 999,
+            zIndex: 100000,
             willChange: "transform",
         },
         cursorOuter: {
@@ -91,7 +91,7 @@ export default function AnimatedCursor({
             width: outerSize,
             height: outerSize,
             backgroundColor: `rgba(${color}, ${outerAlpha})`,
-            zIndex: 999,
+            zIndex: 100000 - 1,
             willChange: "transform",
 
         }

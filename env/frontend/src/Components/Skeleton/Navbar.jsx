@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -17,12 +17,15 @@ import MenuItem from '@mui/material/MenuItem';
 import Drawer from '@mui/material/Drawer';
 import Navigation from './Navigation';
 import Logo from '../Images/Logo.png'
-import { getToken } from '../../services/localStorage'
+import { getToken, storeToken } from '../../services/localStorage'
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import CartButton from './CartButton';
 import WishlistButton from './WishlistButton';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import LinearProgress from '@mui/material/LinearProgress';
+import { useGetLoggedUserQuery } from '../../services/api';
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -42,7 +45,9 @@ HideOnScroll.propTypes = {
     window: PropTypes.func,
 };
 
+
 export default function Navbar(props) {
+
     const pages = [
         { name: 'Home', link: '/' },
         { name: 'Explore', link: '/explore' },
@@ -50,24 +55,67 @@ export default function Navbar(props) {
     ];
     const settings = [
         { name: 'Dashboard', link: '/dashboard' },
-        { name: 'Log Out', link: '/' },
     ];
 
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [openAlert, setOpenAlert] = React.useState(false);
+    const [progress, setProgress] = React.useState(0);
 
     const handleOpenNavMenu = () => {
         setDrawerOpen(true);
     };
 
-    let [access, setAccess] = React.useState(null);
-    const user = useSelector((state) => state.user);
-    console.log(user);
+    const handleLogOut = () => {
+        // Clear the tokens from local storage or any other storage mechanism
+        storeToken({ access: null, refresh: null });
+
+        // Reset the access state
+        setAccess(null);
+
+        // Show the alert
+        setOpenAlert(true);
+
+        // Optionally, clear user state in Redux if you manage it there
+
+        // Redirect the user to the login or home page after a short delay
+        setTimeout(() => {
+            window.location.href = '/gate'; // Redirect to login page
+        }, 2000); // 2 seconds delay
+    };
+
+    let [access_token, setAccess] = React.useState(null);
+    const { data, isSuccess } = useGetLoggedUserQuery({ access_token });
+    const [user, setUser] = useState(useSelector((state) => state.user));
+    useEffect(() => {
+        if (isSuccess) {
+            setUser(data);
+        }
+    }, [isSuccess, data]);
 
     useEffect(() => {
         let { access_token, refresh_token } = getToken();
         setAccess(access_token);
     }, []); // Empty dependency array to ensure it only runs once on mount
+
+    useEffect(() => {
+        if (openAlert) {
+            const timer = setInterval(() => {
+                setProgress((oldProgress) => {
+                    if (oldProgress === 100) {
+                        clearInterval(timer);
+                        return 100;
+                    }
+                    const diff = Math.random() * 10;
+                    return Math.min(oldProgress + diff, 100);
+                });
+            }, 200);
+
+            return () => {
+                clearInterval(timer);
+            };
+        }
+    }, [openAlert]);
 
     const handleCloseNavMenu = () => {
         setDrawerOpen(false);
@@ -79,6 +127,13 @@ export default function Navbar(props) {
 
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
+    };
+
+    const handleCloseAlert = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenAlert(false);
     };
 
     return (
@@ -122,7 +177,10 @@ export default function Navbar(props) {
                                 }}>
 
                                 {pages.map((page) => (
-                                    <Navigation name={page.name} link={page.link}
+                                    <Navigation
+                                        key={page.name}  // Add this line
+                                        name={page.name}
+                                        link={page.link}
                                         sx={{
                                             color: 'black',
                                             display: 'block'
@@ -161,13 +219,20 @@ export default function Navbar(props) {
                                     onClose={handleCloseUserMenu}
                                 >
                                     {user.username ?
-                                        settings.map((setting) => (
-                                            <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
-                                                <Typography sx={{ textAlign: 'center' }}>
-                                                    <Link to={setting.link}>{setting.name}</Link>
+                                        [
+                                            ...settings.map((setting) => (
+                                                <MenuItem key={setting.name} onClick={handleCloseUserMenu}>
+                                                    <Typography sx={{ textAlign: 'center' }}>
+                                                        <Link to={setting.link}>{setting.name}</Link>
+                                                    </Typography>
+                                                </MenuItem>
+                                            )),
+                                            <MenuItem key="logout">
+                                                <Typography onClick={handleLogOut} sx={{ textAlign: 'center' }}>
+                                                    Log Out
                                                 </Typography>
                                             </MenuItem>
-                                        ))
+                                        ]
                                         :
                                         <MenuItem onClick={handleCloseUserMenu}>
                                             <Typography sx={{ textAlign: 'center' }}>
@@ -175,6 +240,7 @@ export default function Navbar(props) {
                                             </Typography>
                                         </MenuItem>
                                     }
+
                                 </Menu>
                             </Box>
                         </Toolbar>
@@ -208,12 +274,60 @@ export default function Navbar(props) {
                 >
                     {pages.map((page) => (
                         <Box key={page.name} sx={{ width: '100%' }}>
-                            <Navigation name={page.name} link={page.link}
-                                sx={{ my: 2, color: 'black', display: 'block' }} />
+                            <Navigation
+                                name={page.name}
+                                link={page.link}
+                                sx={{ my: 2, color: 'black', display: 'block' }}
+                            />
                         </Box>
                     ))}
                 </Box>
             </Drawer>
+
+            <Snackbar
+                open={openAlert}
+                autoHideDuration={2000}
+                onClose={handleCloseAlert}
+                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                sx={{
+                    position: 'absolute',
+                    top: 'auto',
+                    bottom: 'auto',
+                    left: 0,
+                    right: 0,
+                    transform: 'translateY(64px)', // Adjust this value based on your navbar height
+                }}
+            >
+                <Alert
+                    onClose={handleCloseAlert}
+                    severity="error"
+                    sx={{
+                        width: '20vw',
+                        backgroundColor: '#ffcccb', // Light red color
+                        color: 'black',
+                        position: 'relative', // Add this
+                        paddingTop: '20px' // Add some top padding for the progress bar
+                    }}
+                    icon={false} // Remove the default icon
+                >
+                    <LinearProgress
+                        variant="determinate"
+                        value={progress}
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '4px', // Adjust the height as needed
+                            backgroundColor: '#ff9999', // Lighter red for the background
+                            '& .MuiLinearProgress-bar': {
+                                backgroundColor: '#cc0000' // Darker red for the progress bar
+                            }
+                        }}
+                    />
+                    Logging out...
+                </Alert>
+            </Snackbar>
         </React.Fragment>
     );
 }

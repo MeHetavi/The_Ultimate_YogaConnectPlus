@@ -11,7 +11,7 @@ const initialState = {
 }
 
 export const userSlice = createSlice({
-    name: 'user_data',
+    name: 'user',
     initialState,
     reducers: {
         setUserInfo: (state, action) => {

@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import Navbar from '../../Components/Skeleton/Navbar';
 import Footer from '../../Components/Skeleton/Footer';
-import { getToken } from '../../services/localStorage';
 import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
 import { styled } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { useBecomeTraineeMutation } from '../../services/api';
+import { getToken } from '../../services/localStorage';
 const StyledTypography = styled(Typography)(() => ({
     fontFamily: 'Montserrat',
 }));
@@ -15,20 +14,34 @@ const StyledTypography = styled(Typography)(() => ({
 const Dashboard = () => {
     const { username } = useParams();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-
     const { users } = useSelector((state) => state.allUsersData);
-    const user = useSelector((state) => state.user);
-
     const [profile, setProfile] = useState('');
+    const [becomeTrainee, { isLoading, error }] = useBecomeTraineeMutation();
 
-    // Use useEffect to update the profile state when the component mounts
     useEffect(() => {
         const foundUser = users.find((user) => user.username === username);
         if (foundUser) {
             setProfile(foundUser);
         }
     }, [username, users]);
+
+    const handleBecomeTrainee = () => {
+        const access_token = getToken().access_token; // Assuming you have a method to get the token
+        if (profile) {
+            becomeTrainee({ access_token, user: profile.username, profile: profile })
+                .unwrap()
+                .then((response) => {
+                    // Handle successful response
+                    console.log('Trainee status:', response);
+                })
+                .catch((err) => {
+                    // Handle error
+                    console.error('Error becoming trainee:', err);
+                });
+
+
+        }
+    };
 
     if (!profile) {
         return (
@@ -68,10 +81,16 @@ const Dashboard = () => {
                         {profile.name}
                         <br />
                         {profile.username}
+                        <br />
+                        {profile.trainees}
                     </StyledTypography>
 
                     <StyledTypography variant="h4" component="div">
                         Trainees
+                        <Button onClick={handleBecomeTrainee} variant="contained" color="primary" disabled={isLoading}>
+                            {isLoading ? 'Processing...' : 'Become Trainee'}
+                        </Button>
+                        {error && <Typography color="error">{error.message}</Typography>}
                     </StyledTypography>
                 </Box>
             </Box>

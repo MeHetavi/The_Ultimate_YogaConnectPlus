@@ -51,6 +51,31 @@ export const api = createApi({
                 }
             },
         }),
+        becomeTrainee: builder.mutation({
+            query: ({ access_token, user, profile }) => {
+                return {
+                    url: 'becomeTrainee/',
+                    method: 'POST',
+                    body: { user, profile },
+                    headers: {
+                        'authorization': `Bearer ${access_token}`,
+                    }
+                }
+            },
+        }),
+        updateProfile: builder.mutation({
+            query: ({ access_token, data }) => {
+                return {
+                    url: 'updateProfile/',
+                    method: 'PUT',
+                    body: data,
+                    headers: {
+                        'authorization': `Bearer ${access_token}`,
+                    }
+                }
+            },
+        }),
+
 
 
     })
@@ -60,5 +85,7 @@ export const {
     useRegisterUserMutation,
     useLoginUserMutation,
     useGetLoggedUserQuery,
-    useGetUsersQuery
+    useGetUsersQuery,
+    useBecomeTraineeMutation,
+    useUpdateProfileMutation
 } = api
