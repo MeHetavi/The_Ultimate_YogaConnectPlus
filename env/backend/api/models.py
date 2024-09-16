@@ -83,27 +83,32 @@ class Person(AbstractBaseUser):
         "Is the user a member of staff?"
         return self.is_admin
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True)
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name_plural = "Categories"
+# class Product(models.Model):
+#     name = models.CharField(max_length=100)
+#     price = models.IntegerField()
+#     image = models.ImageField(upload_to='products/', null=False, blank=False)
+#     wishlistedBy = models.ManyToManyField('self',symmetrical=False, related_name='Wishlist')
+#     addedToCartBy = models.ManyToManyField('self',symmetrical=False, related_name='Cart')
+# #   colors = models.ManyToManyField('self',symmetrical=False, related_name='Colors')
+#     category = models.CharField(max_length=100)
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, related_name='products')
+    company = models.ForeignKey('Company', on_delete=models.SET_NULL, null=True, related_name='products')
+    sku = models.CharField(max_length=100, unique=True)
     stock_quantity = models.PositiveIntegerField(default=0)
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -117,6 +122,18 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"Image for {self.product.name}"
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 class Company(models.Model):
     name = models.CharField(max_length=255)
@@ -131,28 +148,3 @@ class Company(models.Model):
 
     def __str__(self):
         return self.name
-
-class CartItem(models.Model):
-    user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='cart_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-
-    class Meta:
-        unique_together = ('user', 'product')
-
-    def __str__(self):
-        return f"{self.user.username}'s cart: {self.product.name} (Qty: {self.quantity})"
-
-    @property
-    def total_price(self):
-        return self.quantity * self.product.price
-
-class WishlistItem(models.Model):
-    user = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='wishlist_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('user', 'product')
-
-    def __str__(self):
-        return f"{self.user.username}'s wishlist: {self.product.name}"
