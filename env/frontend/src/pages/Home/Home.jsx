@@ -14,16 +14,34 @@ import { useGetLoggedUserQuery } from "../../services/api.js";
 import { useDispatch } from "react-redux";
 import { setUserInfo } from '../../features/userSlice.js';
 import { getToken } from '../../services/localStorage.js';
+import { useGetUsersQuery } from '../../services/api.js';
+import { useSelector } from 'react-redux';
+import { setAllUsersSlice } from '../../features/allUsersSlice.js';
 
 export default function Home() {
-    const [token, setToken] = React.useState(getToken());
-
+    const { access_token, refresh_token } = getToken();
+    const { data } = useGetLoggedUserQuery({ access_token });
+    const { data: allUsersData, isLoading, isError, error, isSuccess } = useGetUsersQuery();
     const dispatch = useDispatch();
-
-    const { data, isSuccess } = useGetLoggedUserQuery({ access_token: token.access_token });
+    let usersWithFullAvatarPaths = [];
+    const [trainers, setTrainers] = useState([])
 
     useEffect(() => {
-        if (data && token) {
+        if (allUsersData && data) {
+            // Get all the trainers of the current user
+            const userTrainers = allUsersData.filter(user =>
+                user.is_trainer && user.trainees && user.trainees.includes(data.username)
+            ).map(trainer => trainer.username);
+
+            setTrainers(userTrainers);
+
+            dispatch(setUserInfo({ ...data, trainers: userTrainers }));
+            dispatch(setAllUsersSlice({ users: usersWithFullAvatarPaths }));
+        }
+    }, [allUsersData, data, dispatch])
+
+    useEffect(() => {
+        if (data && access_token) {
             dispatch(setUserInfo({
                 username: data.username,
                 email: data.email,
@@ -35,11 +53,17 @@ export default function Home() {
                 following: data.following,
                 trainees: data.trainees,
                 posts: data.posts,
-                avatar: data.avatar
+                avatar: data.avatar,
+                trainers: data.trainers,
             }))
         }
-    }, [data, token])
-    console.log(data)
+    }, [data, access_token])
+
+    useEffect(() => {
+        if (allUsersData) {
+
+        }
+    }, [allUsersData])
 
     return (
         <>

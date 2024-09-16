@@ -3,7 +3,7 @@ import '../../Components/Styles/Explore/SearchBar.css';
 import Navbar from '../../Components/Skeleton/Navbar';
 import Footer from '../../Components/Skeleton/Footer';
 import '../../Components/Styles/Explore/Explore.css';
-import { Typography, Box, List, ListItem, Stack } from '@mui/material';
+import { Typography, Box, List, ListItem, Stack, CircularProgress, useTheme, useMediaQuery } from '@mui/material';
 import ProfileCard from '../../Components/Explore/ProfileCard';
 import { motion } from 'framer-motion';
 import { useDispatch } from 'react-redux';
@@ -13,43 +13,76 @@ import { useGetUsersQuery } from '../../services/api';
 import { Link } from 'react-router-dom';
 import { Avatar } from '@mui/material';
 
+// Configuration
+const API_BASE_URL = 'http://localhost:8000';  // Adjust this to match your backend URL
+
+// Helper function to construct the full avatar path
+const getFullAvatarPath = (avatarPath) => {
+    if (!avatarPath) return null;
+    // Remove any leading slash from avatarPath
+    const cleanPath = avatarPath.replace(/^\//, '');
+    return `${API_BASE_URL}/${cleanPath}`;
+};
+
 const Explore = () => {
     const [profiles, setProfiles] = useState({ users: [] });
-    const [searchTerm, setSearchTerm] = useState(''); // Initialize as an empty string
+    const [searchTerm, setSearchTerm] = useState('');
     const [filteredProfiles, setFilteredProfiles] = useState([]);
     const dispatch = useDispatch();
     const { access_token } = getToken();
-    const { data, isSuccess } = useGetUsersQuery(access_token);
+    const { data, isLoading, isError, error } = useGetUsersQuery(access_token);
 
-    // Store User Friends in Local State
+    const theme = useTheme();
+    const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+    const isSm = useMediaQuery(theme.breakpoints.only('sm'));
+    const isMd = useMediaQuery(theme.breakpoints.only('md'));
+
     useEffect(() => {
-        if (data && profiles.users !== data) {
-            setProfiles({ users: data });
-            setFilteredProfiles(data);
+        if (data) {
+            const usersArray = Array.isArray(data) ? data : (data.users || []);
+            const usersWithFullAvatarPaths = usersArray.map(user => ({
+                ...user,
+                avatar: getFullAvatarPath(user.avatar)
+            }));
+            setProfiles({ users: usersWithFullAvatarPaths });
+            setFilteredProfiles(usersWithFullAvatarPaths);
+            dispatch(setAllUsersSlice({ users: usersWithFullAvatarPaths }));
         }
-    }, [data, profiles.users]);
+    }, [data, dispatch]);
 
-    // Store User Friends in Redux Store
     useEffect(() => {
-        if (data && isSuccess) {
-            dispatch(setAllUsersSlice({ users: data }));
-        }
-    }, [data, isSuccess, dispatch]);
-
-    // Filter profiles based on search term
-    useEffect(() => {
-        if (searchTerm) {
-            const resultsByUsername = profiles.users.filter(profile =>
-                profile.username.toLowerCase().includes(searchTerm.toLowerCase())
+        if (searchTerm && profiles.users && profiles.users.length > 0) {
+            const filtered = profiles.users.filter(profile =>
+                profile.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (profile.name && profile.name.toLowerCase().includes(searchTerm.toLowerCase()))
             );
-            const resultsByName = profiles.users.filter(profile =>
-                profile.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredProfiles([...new Set([...resultsByUsername, ...resultsByName])]);
+            setFilteredProfiles(filtered);
         } else {
-            setFilteredProfiles([]);
+            setFilteredProfiles(profiles.users || []);
         }
     }, [searchTerm, profiles.users]);
+
+    if (isLoading) {
+        return (
+            <>
+                <Navbar />
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+                    <CircularProgress />
+                </Box>
+            </>
+        );
+    }
+
+    if (isError) {
+        return (
+            <>
+                <Navbar />
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+                    <Typography color="error">Error: {error.message}</Typography>
+                </Box>
+            </>
+        );
+    }
 
     return (
         <>
@@ -60,7 +93,7 @@ const Explore = () => {
                     <div className="shadow__input"></div>
                     <button className="input__button__shadow">
                         <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20px" width="20px">
-                            <path d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z" fill-rule="evenodd" fill="#17202A"></path>
+                            <path d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z" fillRule="evenodd" fill="#17202A"></path>
                         </svg>
                     </button>
                     <input
@@ -69,7 +102,7 @@ const Explore = () => {
                         className="input__search"
                         placeholder="Search..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)} // Change from onClick to onChange
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
             </div>
@@ -83,9 +116,10 @@ const Explore = () => {
                                 sx={{ background: '#f0f0f0', margin: '5px 0', padding: '10px', borderRadius: '10px' }}
                             >
                                 <Avatar
+                                    src={profile.avatar}
                                     sx={{
-                                        width: "2rem",
-                                        height: "2rem",
+                                        width: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
+                                        height: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
                                         border: "1px solid #acd6e2",
                                         display: 'relative',
                                         top: '-10px'
@@ -106,7 +140,7 @@ const Explore = () => {
                                             fontWeight: '500',
                                             color: '#323232',
                                             fontFamily: "Montserrat",
-                                            fontSize: '15px',
+                                            fontSize: { xs: '12px', sm: '14px', md: '16px' },
                                         }}
                                     >
                                         <Link to={`/profile/${profile.username}`}>{profile.username}</Link>
@@ -116,7 +150,7 @@ const Explore = () => {
                                             fontWeight: '300',
                                             color: '#323232',
                                             fontFamily: "Montserrat",
-                                            fontSize: '12px',
+                                            fontSize: { xs: '10px', sm: '12px', md: '14px' },
                                         }}
                                     >
                                         {profile.name}
@@ -140,8 +174,8 @@ const Explore = () => {
                         color: '#323232',
                         fontFamily: "Montserrat",
                         textAlign: 'center',
-                        fontSize: '35px',
-                        marginTop: filteredProfiles.length > 0 ? '5vh' : '10vh' // Adjust margin based on search results
+                        fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '35px' },
+                        marginTop: filteredProfiles.length > 0 ? '5vh' : '10vh'
                     }}
                 >
                     Top Trainers

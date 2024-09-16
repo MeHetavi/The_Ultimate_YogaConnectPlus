@@ -1,1 +1,4 @@
 Make explore page scroll sec into grid
+Become trainee
+Dispaly trainees of a trainer in profile page
+Add to cart in shop and like and also update cart

@@ -8,7 +8,8 @@ export default function LeftNavbar() {
         { name: 'Dashboard', link: '/dashboard' },
         { name: 'Edit', link: '/updateProfile' },
         { name: 'Progress', link: '/progress' },
-        { name: 'Subscribe', link: '/subscribe' },
+        { name: 'Orders', link: '/orders' },
+        { name: 'Change Password', link: '/changePassword' },
     ]
 
     return (

@@ -1,41 +1,27 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import Group
-from .models import Person
+from .models import Person, Product, Category, Company, ProductImage
 
-class PersonAdmin(BaseUserAdmin):
-    # The fields to be used in displaying the User model.
-    list_display = ('username', 'email', 'name', 'age', 'gender', 'is_trainer', 'is_active','is_admin', 'avatar')
-    list_filter = ('is_admin', 'is_trainer')
-    fieldsets = (
-        (None, {'fields': ('username', 'email', 'password')}),
-        ('Personal info', {'fields': ('name', 'age', 'gender', 'is_trainer')}),
-        ('Permissions', {'fields': ('is_admin', 'is_active')}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'name', 'age', 'gender', 'is_trainer', 'password1', 'password2')}
-        ),
-    )
-    search_fields = ('email', 'username', 'name')
-    ordering = ('username',)
-    filter_horizontal = ()
+class PersonAdmin(admin.ModelAdmin):
+    list_display = ('id', 'username', 'email', 'name', 'age', 'gender', 'is_trainer', 'is_active', 'is_admin')
+    list_filter = ('is_trainer', 'is_active', 'is_admin')
+    search_fields = ('username', 'email', 'name')
 
-    def follower_count(self, obj):
-        return obj.followers.count()
-    follower_count.short_description = 'Followers'
+    # If you want to display cart and wishlist items, you can add custom methods
+    def cart_items_count(self, obj):
+        return obj.cart_items.count()
+    cart_items_count.short_description = 'Cart Items'
 
-    def following_count(self, obj):
-        return obj.following.count()
-    following_count.short_description = 'Following'
+    def wishlist_items_count(self, obj):
+        return obj.wishlist_items.count()
+    wishlist_items_count.short_description = 'Wishlist Items'
 
-    def trainee_count(self, obj):
-        return obj.trainees.count()
-    trainee_count.short_description = 'Trainees'
+    # Add these methods to list_display if you want to show the counts
+    list_display += ('cart_items_count', 'wishlist_items_count')
 
-# Register the new PersonAdmin...
 admin.site.register(Person, PersonAdmin)
 
-# Unregister the Group model from admin as we're not using Django's built-in permissions
-admin.site.unregister(Group)
+# Register other models
+admin.site.register(Product)
+admin.site.register(Category)
+admin.site.register(Company)
+admin.site.register(ProductImage)

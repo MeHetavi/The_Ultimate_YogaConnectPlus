@@ -1,15 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-
-// Configuration
-const API_BASE_URL = 'http://localhost:8000';  // Adjust this to match your backend URL
-
-// Helper function to construct the full avatar path
-const getFullAvatarPath = (avatarPath) => {
-    if (!avatarPath) return null;
-    // Remove any leading slash from avatarPath
-    const cleanPath = avatarPath.replace(/^\//, '');
-    return `${API_BASE_URL}/${cleanPath}`;
-};
+import { getFullAvatarPath } from '../services/localStorage'
 
 const initialState = {
     username: '',
@@ -19,6 +9,7 @@ const initialState = {
     gender: '',
     is_trainer: '',
     trainees: [],
+    trainers: [],  // New field
     avatar: null,
 }
 
@@ -34,6 +25,7 @@ export const userSlice = createSlice({
             state.gender = action.payload.gender
             state.is_trainer = action.payload.is_trainer
             state.trainees = action.payload.trainees
+            state.trainers = action.payload.trainers
             state.avatar = getFullAvatarPath(action.payload.avatar)
         },
         unsetUserInfo: (state) => {
@@ -44,6 +36,7 @@ export const userSlice = createSlice({
             state.gender = ''
             state.is_trainer = ''
             state.trainees = []
+            state.trainers = []
             state.avatar = null
         },
     }

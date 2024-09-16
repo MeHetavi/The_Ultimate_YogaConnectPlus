@@ -74,6 +74,7 @@ const ProfileCard = ({ profile }) => {
                     border: "4px solid #acd6e2",
                     margin: "0 auto",
                 }}
+                src={profile.avatar}
             >
                 <svg
                     viewBox="0 0 448 512"

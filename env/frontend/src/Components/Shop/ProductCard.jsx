@@ -165,7 +165,7 @@ const AddToCartButton = () => {
 
 
 
-const ProductCard = () => {
+const ProductCard = ({ product }) => {
     return (
         <Card
             sx={{
@@ -218,8 +218,9 @@ const ProductCard = () => {
                         fontFamily: "Montserrat",
                     }}
                 >
-                    Product title
+                    {product.name}
                 </Typography>
+
 
                 <Divider
                     sx={{
@@ -241,7 +242,7 @@ const ProductCard = () => {
                             fontWeight: '400',
                             fontFamily: "Montserrat",
                         }}>
-                        <span style={{ color: '#666' }}>$</span> 123.45
+                        <span style={{ color: '#666' }}>$</span> {product.price}
                     </Typography>
                     <HeartButton />
                 </Box>

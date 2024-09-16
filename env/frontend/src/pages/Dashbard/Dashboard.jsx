@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Button, Avatar, ThemeProvider, createTheme, CircularProgress, Modal, IconButton } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, Avatar, ThemeProvider, createTheme, Modal, IconButton, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Navbar from '../../Components/Skeleton/Navbar';
 import Grid from '@mui/material/Grid2';
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
 import { useSelector } from 'react-redux';
-import { useGetLoggedUserQuery } from '../../services/api';
-import { getToken } from '../../services/localStorage';
+import { Link as RouterLink } from 'react-router-dom';
 
 // Configuration
-const API_BASE_URL = '';  // Adjust this to match your backend URL
-
 const theme = createTheme({
     typography: {
         fontFamily: 'Montserrat, sans-serif',
     },
 });
 
+const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    borderRadius: '10px',
+    boxShadow: 24,
+    p: 4,
+};
 
-const Settings = () => {
-    const { access_token, refresh_token } = getToken();
+const Dashboard = () => {
     const user = useSelector((state) => state.user);
-    const [isLoading, setIsLoading] = useState(true);
-    const [openModal, setOpenModal] = useState(false);
-    const handleOpenModal = () => setOpenModal(true);
-    const handleCloseModal = () => setOpenModal(false);
+    const [openTraineesModal, setOpenTraineesModal] = useState(false);
+    const [openTrainersModal, setOpenTrainersModal] = useState(false);
+
+    const handleOpenTraineesModal = () => setOpenTraineesModal(true);
+    const handleCloseTraineesModal = () => setOpenTraineesModal(false);
+    const handleOpenTrainersModal = () => setOpenTrainersModal(true);
+    const handleCloseTrainersModal = () => setOpenTrainersModal(false);
 
     return (
         <ThemeProvider theme={theme}>
@@ -43,7 +53,7 @@ const Settings = () => {
                     }}
                 >
                     <Typography variant="h4" component="div" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
-                        User Profile
+                        Dashboard
                     </Typography>
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
@@ -63,10 +73,14 @@ const Settings = () => {
                                         <Typography variant="body1"><strong>Email:</strong> {user.email}</Typography>
                                         <Typography variant="body1"><strong>Age:</strong> {user.age}</Typography>
                                         <Typography variant="body1"><strong>User Type:</strong> {user.is_trainer ? "Trainer" : "General"}</Typography>
+                                        <Typography variant="body1"><strong>Trainers:</strong> {user.trainers.length}</Typography>
+                                        <Button variant="contained" onClick={handleOpenTrainersModal} sx={{ mt: 2, mr: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
+                                            View Trainers
+                                        </Button>
                                         {user.is_trainer && (
                                             <>
                                                 <Typography variant="body1"><strong>Number of Trainees:</strong> {user.trainees ? user.trainees.length : 0}</Typography>
-                                                <Button variant="contained" onClick={handleOpenModal} sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
+                                                <Button variant="contained" onClick={handleOpenTraineesModal} sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
                                                     View Trainees
                                                 </Button>
                                             </>
@@ -78,37 +92,75 @@ const Settings = () => {
                     </Grid>
                 </Box>
             </Box>
+
+            {/* Trainers Modal */}
             <Modal
-                open={openModal}
-                onClose={handleCloseModal}
+                open={openTrainersModal}
+                onClose={handleCloseTrainersModal}
+                aria-labelledby="trainers-list-modal"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={modalStyle}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        <Typography id="trainers-list-modal" variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                            Trainers List
+                        </Typography>
+                        <IconButton onClick={handleCloseTrainersModal} aria-label="close">
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    {user.trainers && user.trainers.length > 0 ? (
+                        <Box sx={{ maxHeight: '300px', overflowY: 'auto' }}>
+                            {user.trainers.map((trainer, index) => (
+                                <Box key={index} sx={{ py: 1, borderBottom: '1px solid #e0e0e0' }}>
+                                    <Link
+                                        replace
+                                        component={RouterLink}
+                                        to={`/profile/${trainer}`}
+                                        color="inherit"
+                                        underline="hover"
+                                    >
+                                        {trainer}
+                                    </Link>
+                                </Box>
+                            ))}
+                        </Box>
+                    ) : (
+                        <Typography>No trainers found.</Typography>
+                    )}
+                </Box>
+            </Modal>
+
+            {/* Trainees Modal */}
+            <Modal
+                open={openTraineesModal}
+                onClose={handleCloseTraineesModal}
                 aria-labelledby="trainee-list-modal"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 400,
-                    bgcolor: 'background.paper',
-                    borderRadius: '10px',
-                    boxShadow: 24,
-                    p: 4,
-                }}>
+                <Box sx={modalStyle}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                         <Typography id="trainee-list-modal" variant="h6" component="h2" sx={{ fontWeight: 600 }}>
                             Trainee List
                         </Typography>
-                        <IconButton onClick={handleCloseModal} aria-label="close">
+                        <IconButton onClick={handleCloseTraineesModal} aria-label="close">
                             <CloseIcon />
                         </IconButton>
                     </Box>
                     {user.trainees && user.trainees.length > 0 ? (
                         <Box sx={{ maxHeight: '300px', overflowY: 'auto' }}>
                             {user.trainees.map((trainee, index) => (
-                                <Typography key={index} sx={{ py: 1, borderBottom: '1px solid #e0e0e0' }}>
-                                    {trainee}
-                                </Typography>
+                                <Box key={index} sx={{ py: 1, borderBottom: '1px solid #e0e0e0' }}>
+                                    <Link
+                                        replace
+                                        component={RouterLink}
+                                        to={`/profile/${trainee}`}
+                                        color="inherit"
+                                        underline="hover"
+                                    >
+                                        {trainee}
+                                    </Link>
+                                </Box>
                             ))}
                         </Box>
                     ) : (
@@ -120,4 +172,4 @@ const Settings = () => {
     );
 };
 
-export default Settings;
+export default Dashboard;

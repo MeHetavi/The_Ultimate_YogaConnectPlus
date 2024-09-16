@@ -9,6 +9,7 @@ import { useUpdateProfileMutation } from '../../services/api';
 import { getToken } from '../../services/localStorage';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../features/userSlice';
+import { getFullAvatarPath } from '../../services/localStorage';
 
 // Create a theme
 const theme = createTheme({
@@ -26,7 +27,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     '& .MuiInputLabel-root': {
         color: theme.palette.text.primary,
         fontSize: '0.9rem',
-        fontWeight: '600', // Increased from 400 to 600
+        fontWeight: '600',
         fontFamily: 'Montserrat, sans-serif',
         transform: 'translate(14px, 10px) scale(1)',
         '&.MuiInputLabel-shrink': {
@@ -69,21 +70,22 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     },
 }));
 
+const ErrorText = styled(Typography)({
+    color: 'red',
+    fontSize: '0.75rem',
+    marginTop: '0.25rem',
+});
+
 const UpdateProfile = (props) => {
     const data = useSelector((state) => state.user);
     const [user, setUser] = useState({});
     const dispatch = useDispatch();
     const [editedUser, setEditedUser] = useState({});
     const [isEditing, setIsEditing] = useState(false);
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [oldPassword, setOldPassword] = useState('');
     const [avatar, setAvatar] = useState(null);
     const { access_token, refresh_token } = getToken()
     const [updateUser, { isLoading: isUpdating }] = useUpdateProfileMutation();
     const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [passwordUpdateError, setPasswordUpdateError] = useState('');
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
@@ -91,6 +93,7 @@ const UpdateProfile = (props) => {
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [isCropping, setIsCropping] = useState(false);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (data.username !== '') {
@@ -102,16 +105,7 @@ const UpdateProfile = (props) => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditedUser(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handlePasswordChange = (e) => {
-        setNewPassword(e.target.value);
-        setPasswordError('');
-    };
-
-    const handleConfirmPasswordChange = (e) => {
-        setConfirmPassword(e.target.value);
-        setPasswordError('');
+        setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     const handleAvatarChange = (e) => {
@@ -188,7 +182,6 @@ const UpdateProfile = (props) => {
             formData.append('avatar', null);
 
             const result = await updateUser({ access_token, data: formData }).unwrap();
-
             dispatch(setUserInfo(result));
             setUser(result);
             setEditedUser(result);
@@ -215,11 +208,6 @@ const UpdateProfile = (props) => {
     };
 
     const handleUpdate = async () => {
-        if (newPassword && newPassword !== confirmPassword) {
-            setPasswordError("Passwords don't match");
-            return;
-        }
-
         try {
             const formData = new FormData();
             Object.keys(editedUser).forEach(key => {
@@ -227,12 +215,6 @@ const UpdateProfile = (props) => {
                     formData.append(key, editedUser[key]);
                 }
             });
-
-            const isAttemptingPasswordChange = newPassword && oldPassword;
-            if (isAttemptingPasswordChange) {
-                formData.append('password', newPassword);
-                formData.append('old_password', oldPassword);
-            }
 
             if (avatar) {
                 const response = await fetch(avatar);
@@ -244,32 +226,18 @@ const UpdateProfile = (props) => {
 
             const result = await updateUser({ access_token, data: formData }).unwrap();
 
-            console.log('Update result:', result);
-
-            // Update Redux store with the new user info
-            dispatch(setUserInfo(result));
+            dispatch(setUserInfo({ ...result, trainers: data.trainers, trainees: data.trainees, is_trainer: data.is_trainer }));
 
             setUser(result);
             setEditedUser(result);
             setIsEditing(false);
-            setNewPassword('');
-            setConfirmPassword('');
-            setOldPassword('');
             setAvatar(null);
+            setErrors({});
 
-            if (isAttemptingPasswordChange && !result.password_updated) {
-                setSnackbarMessage("Profile updated, but password change failed. Old password may be incorrect.");
-                setSnackbarSeverity('warning');
-                setPasswordUpdateError("Old password is incorrect. Password not updated.");
-            } else {
-                setSnackbarMessage("Profile updated successfully!");
-                setSnackbarSeverity('success');
-                setPasswordUpdateError('');
-            }
-
+            setSnackbarMessage("Profile updated successfully!");
+            setSnackbarSeverity('success');
             setOpenSnackbar(true);
 
-            // Automatically close the snackbar after 6 seconds
             setTimeout(() => {
                 setOpenSnackbar(false);
             }, 6000);
@@ -277,30 +245,25 @@ const UpdateProfile = (props) => {
         } catch (error) {
             console.error('Failed to update user:', error);
             console.error('Error response:', error.data);
-            setSnackbarMessage(`Failed to update profile: ${error.data?.detail || 'Please try again.'}`);
-            setSnackbarSeverity('error');
-            setOpenSnackbar(true);
+            if (error.data && typeof error.data === 'object') {
+                setErrors(error.data.errors);
+            } else {
+                setSnackbarMessage(`Failed to update profile: ${error.data?.detail || 'Please try again.'}`);
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
+            }
 
-            // Automatically close the snackbar after 6 seconds
             setTimeout(() => {
                 setOpenSnackbar(false);
             }, 6000);
         }
     };
 
-    const handleOldPasswordChange = (e) => {
-        setOldPassword(e.target.value);
-        setPasswordUpdateError(''); // Clear the error when user starts typing
-    };
-
     const handleCancel = () => {
         setEditedUser(user);
         setIsEditing(false);
-        setNewPassword('');
-        setConfirmPassword('');
-        setPasswordError('');
-        setOldPassword('');
         setAvatar(null);
+        setErrors({});
     };
 
     const handleCloseSnackbar = (event, reason) => {
@@ -328,7 +291,7 @@ const UpdateProfile = (props) => {
                         }}
                     >
                         <Typography variant="h4" component="div" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
-                            Update Profile
+                            Edit Profile
                         </Typography>
                         <Grid container spacing={3}>
                             <Grid item xs={12}>
@@ -337,7 +300,7 @@ const UpdateProfile = (props) => {
                                         <Box display="flex" alignItems="center" mb={3}>
                                             <Box mr={3}>
                                                 <Avatar
-                                                    src={avatar || editedUser.avatar}
+                                                    src={avatar || getFullAvatarPath(editedUser.avatar)}
                                                     sx={{ width: 100, height: 100 }}
                                                 />
                                             </Box>
@@ -392,50 +355,11 @@ const UpdateProfile = (props) => {
                                                             disabled={!isEditing}
                                                             margin="normal"
                                                             placeholder={`Enter ${field.label.toLowerCase()}`}
+                                                            error={!!errors[field.name]}
                                                         />
+                                                        {errors[field.name] && <ErrorText>{errors[field.name]}</ErrorText>}
                                                     </Grid>
                                                 ))}
-                                                {isEditing && (
-                                                    <>
-                                                        <Grid item xs={12} sm={6}>
-                                                            <StyledTextField
-                                                                fullWidth
-                                                                label="Old Password"
-                                                                type="password"
-                                                                value={oldPassword}
-                                                                onChange={handleOldPasswordChange}
-                                                                margin="normal"
-                                                                placeholder="Enter old password"
-                                                                error={!!passwordUpdateError}
-                                                                helperText={passwordUpdateError}
-                                                            />
-                                                        </Grid>
-                                                        <Grid item xs={12} sm={6}>
-                                                            <StyledTextField
-                                                                fullWidth
-                                                                label="New Password"
-                                                                type="password"
-                                                                value={newPassword}
-                                                                onChange={handlePasswordChange}
-                                                                margin="normal"
-                                                                placeholder="Enter new password"
-                                                            />
-                                                        </Grid>
-                                                        <Grid item xs={12} sm={6}>
-                                                            <StyledTextField
-                                                                fullWidth
-                                                                label="Confirm New Password"
-                                                                type="password"
-                                                                value={confirmPassword}
-                                                                onChange={handleConfirmPasswordChange}
-                                                                margin="normal"
-                                                                error={!!passwordError}
-                                                                helperText={passwordError}
-                                                                placeholder="Confirm new password"
-                                                            />
-                                                        </Grid>
-                                                    </>
-                                                )}
                                             </Grid>
                                         </Box>
                                         <Box mt={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>

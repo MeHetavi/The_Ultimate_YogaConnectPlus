@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import { useEffect } from 'react';
 import Home from './pages/Home/Home';
 import Gate from './pages/Gate/Gate';
@@ -10,36 +10,20 @@ import Profile from './pages/Trainer`s Profile/Profie';
 import ShopByGenere from './pages/Shop/ShopByGenere';
 import UpdateProfile from './pages/Dashbard/UpdateProfile';
 import Dashboard from './pages/Dashbard/Dashboard';
-import { useNavigate } from 'react-router-dom';
-function NavigationHandler({ children }) {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      sessionStorage.setItem('isReloading', 'true');
-    };
-
-    const handleLoad = () => {
-      const isReloading = sessionStorage.getItem('isReloading');
-      if (isReloading) {
-        sessionStorage.removeItem('isReloading');
-        navigate('/');
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('load', handleLoad);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('load', handleLoad);
-    };
-  }, [navigate]);
-
-  return children;
-}
+import Orders from './pages/Dashbard/Orders';
+import ChangePassword from './pages/Dashbard/ChangePassword';
+import NotFound from './pages/Error/NotFound';
+import { useSelector } from 'react-redux';
+import Cart from './pages/Shop/Cart';
+import Wishlist from './pages/Shop/Wishlist';
 
 function App() {
+  const user = useSelector((state) => state.user);
+  // Helper function to render protected routes
+  const ProtectedRoute = ({ element }) => {
+    return user ? element : <Navigate to="/404" replace />;
+  };
+
   return (
     <div className="App">
       <AnimatedCursor></AnimatedCursor>
@@ -47,19 +31,25 @@ function App() {
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
       </style>
       <BrowserRouter>
-        <NavigationHandler>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/gate" element={<Gate />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/updateProfile" element={<UpdateProfile />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/explore/profile/:username" element={<Profile />} />
-            <Route path="/shop/:genere" element={<ShopByGenere />} />
-          </Routes>
-        </NavigationHandler>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/gate" element={<Gate />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
+          <Route path="/progress" element={<ProtectedRoute element={<Progress />} />} />
+          <Route path="/updateProfile" element={<ProtectedRoute element={<UpdateProfile />} />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/explore/profile/:username" element={<Profile />} />
+          <Route path="/profile/:username" element={<Profile />} />
+          <Route path="/shop/:genere" element={<ShopByGenere />} />
+          <Route path="/orders" element={<ProtectedRoute element={<Orders />} />} />
+          <Route path="/changePassword" element={<ProtectedRoute element={<ChangePassword />} />} />
+          <Route path="/cart" element={<ProtectedRoute element={<Cart />} />} />
+          <Route path="/wishlist" element={<ProtectedRoute element={<Wishlist />} />} />
+          {/* 404 Route */}
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Routes>
       </BrowserRouter>
     </div>
   );

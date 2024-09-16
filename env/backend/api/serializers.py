@@ -1,6 +1,9 @@
 from rest_framework import serializers 
-from .models import Person
+from .models import Category, Company, Person, Product, ProductImage
 from django.contrib.auth.password_validation import validate_password
+
+def get_trainers(obj):
+    return list(Person.objects.filter(trainees=obj).values_list('username', flat=True))
 
 class PersonRegistrationSerializer(serializers.ModelSerializer):
   # We are writing this becoz we need confirm password field in our Registratin Request
@@ -35,24 +38,27 @@ class SignInSerializer(serializers.ModelSerializer):
     fields = ['username', 'password']
 
 class PersonDashboardSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = Person
-    fields = ['username', 'email', 'name', 'age', 'gender','is_trainer','trainees','avatar']
+    trainers = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Person
+        fields = ['username', 'email', 'name', 'age', 'gender', 'is_trainer', 'trainees', 'avatar', 'trainers']
+
+    def get_trainers(self, obj):
+        return get_trainers(obj)
 
 class GetAllUsersSeializer(serializers.ModelSerializer) :
   class Meta:
     model = Person
-    fields = ['username', 'email', 'name','is_trainer','trainees']
+    fields = ['username', 'email', 'name','is_trainer','trainees','age','gender','avatar']
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
-    old_password = serializers.CharField(write_only=True, required=False)
     # avatar = serializers.ImageField(required=False, allow_null=True)
     remove_avatar = serializers.BooleanField(required=False, write_only=True)
 
     class Meta:
         model = Person
-        fields = ['name', 'age', 'gender', 'email', 'username', 'password', 'old_password', 'avatar', 'remove_avatar']
+        fields = ['name', 'age', 'gender', 'email', 'username', 'avatar', 'remove_avatar']
 
     def validate_email(self, value):
         user = self.instance
@@ -101,3 +107,50 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['id', 'name', 'slug', 'website']
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug', 'parent']
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image', 'is_primary', 'alt_text']
+
+class ProductSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'slug', 'description', 'price', 'category', 'company', 'sku', 'stock_quantity', 'is_available']
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_new_password = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_new_password']:
+            raise serializers.ValidationError({"new_password": "New passwords don't match."})
+        return attrs
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is incorrect.")
+        return value
+
+    def validate_new_password(self, value):
+        user = self.context['request'].user
+        try:
+            validate_password(value, user)
+        except serializers.ValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value

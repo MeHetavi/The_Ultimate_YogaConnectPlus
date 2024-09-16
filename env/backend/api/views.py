@@ -4,8 +4,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
-from .models import Person
-from .serializers import GetAllUsersSeializer, PersonRegistrationSerializer, SignInSerializer, PersonDashboardSerializer, UpdateUserProfileSerializer
+from .models import Person, Category, Product, ProductImage
+from .serializers import (
+    GetAllUsersSeializer, PersonRegistrationSerializer, SignInSerializer, 
+    PersonDashboardSerializer, UpdateUserProfileSerializer,
+    CategorySerializer, ProductSerializer, ProductImageSerializer,ChangePasswordSerializer
+)
 from django.contrib.auth import authenticate
 from .renderers import PersonRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -62,8 +66,7 @@ class Dashboard(APIView):
 
 class GetAllUsers(APIView):
     renderer_classes = [PersonRenderer]
-    permission_classes = []  # Ensure the user is authenticated
-
+    permission_classes = []
     def get(self, request, format=None):
         # Filter trainers and exclude the current user
         if request.user:
@@ -86,8 +89,8 @@ class BecomeTrainee(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        profile = request.data.get('profile')
-        profile = Person.objects.get(username=profile['username'])
+        profile_username = request.data.get('profile_username')
+        profile = Person.objects.get(username=profile_username)
         profile.trainees.add(request.user)
         return Response( status=status.HTTP_200_OK)
 
@@ -100,7 +103,47 @@ class UpdateProfile(APIView):
         if serializer.is_valid():
             user = serializer.save()
             response_data = serializer.data
-            response_data['password_updated'] = 'password' in request.data
             response_data['avatar_removed'] = 'remove_avatar' in request.data and request.data['remove_avatar']
             return Response(response_data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class GetAllProductsByCategory(APIView):
+    def get(self, request, format=None):
+        categories = Category.objects.all()
+        data = []
+
+        for category in categories:
+            category_data = CategorySerializer(category).data
+            products = Product.objects.filter(category=category)
+            product_data = []
+
+            for product in products:
+                product_serializer = ProductSerializer(product).data
+                images = ProductImage.objects.filter(product=product)
+                image_data = ProductImageSerializer(images, many=True).data
+                product_serializer['images'] = image_data
+                product_data.append(product_serializer)
+
+            category_data['products'] = product_data
+            data.append(category_data)
+
+        return Response(data, status=status.HTTP_200_OK)
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [PersonRenderer]
+
+    def put(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = request.user
+            old_password = serializer.validated_data['old_password']
+            new_password = serializer.validated_data['new_password']
+
+            # Change the password
+            user.set_password(new_password)
+            user.save()
+
+            return Response({"message": "Password changed successfully."}, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

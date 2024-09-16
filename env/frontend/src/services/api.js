@@ -52,11 +52,11 @@ export const api = createApi({
             },
         }),
         becomeTrainee: builder.mutation({
-            query: ({ access_token, user, profile }) => {
+            query: ({ access_token, profile_username }) => {
                 return {
                     url: 'becomeTrainee/',
                     method: 'POST',
-                    body: { user, profile },
+                    body: { profile_username },
                     headers: {
                         'authorization': `Bearer ${access_token}`,
                     }
@@ -75,9 +75,95 @@ export const api = createApi({
                 }
             },
         }),
+        getProductsByCategory: builder.query({
+            query: () => {
+                return {
+                    url: 'products/',
+                    method: 'GET',
+                }
+            },
+        }),
+        changePassword: builder.mutation({
+            query: ({ access_token, data }) => {
+                return {
+                    url: 'changePassword/',
+                    method: 'PUT',
+                    body: data,
+                    headers: {
+                        'authorization': `Bearer ${access_token}`,
+                    }
+                }
+            },
+        }),
 
+        // New endpoints for cart and wishlist
+        getCart: builder.query({
+            query: ({ access_token }) => ({
+                url: 'cart/',
+                method: 'GET',
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                },
+            }),
+        }),
 
+        addToCart: builder.mutation({
+            query: ({ access_token, product_id }) => ({
+                url: 'cart/',
+                method: 'POST',
+                body: { product_id },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                    'Content-type': 'application/json',
+                },
+            }),
+        }),
 
+        removeFromCart: builder.mutation({
+            query: ({ access_token, product_id }) => ({
+                url: 'cart/',
+                method: 'DELETE',
+                body: { product_id },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                    'Content-type': 'application/json',
+                },
+            }),
+        }),
+
+        getWishlist: builder.query({
+            query: ({ access_token }) => ({
+                url: 'wishlist/',
+                method: 'GET',
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                },
+            }),
+        }),
+
+        addToWishlist: builder.mutation({
+            query: ({ access_token, product_id }) => ({
+                url: 'wishlist/',
+                method: 'POST',
+                body: { product_id },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                    'Content-type': 'application/json',
+                },
+            }),
+        }),
+
+        removeFromWishlist: builder.mutation({
+            query: ({ access_token, product_id }) => ({
+                url: 'wishlist/',
+                method: 'DELETE',
+                body: { product_id },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                    'Content-type': 'application/json',
+                },
+            }),
+        }),
     })
 })
 
@@ -87,5 +173,13 @@ export const {
     useGetLoggedUserQuery,
     useGetUsersQuery,
     useBecomeTraineeMutation,
-    useUpdateProfileMutation
+    useUpdateProfileMutation,
+    useGetProductsByCategoryQuery,
+    useChangePasswordMutation,
+    useGetCartQuery,
+    useAddToCartMutation,
+    useRemoveFromCartMutation,
+    useGetWishlistQuery,
+    useAddToWishlistMutation,
+    useRemoveFromWishlistMutation,
 } = api
