@@ -5,7 +5,6 @@ export const api = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: 'http://127.0.0.1:8000/api/' }),
 
     endpoints: (builder) => ({
-
         registerUser: builder.mutation({
             query: (user) => {
                 return {
@@ -164,6 +163,28 @@ export const api = createApi({
                 },
             }),
         }),
+        saveVideoCallURL: builder.mutation({
+            query: ({ access_token, url }) => ({
+                url: 'videoCallURL/',
+                method: 'POST',
+                body: { url },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                    'Content-type': 'application/json',
+                },
+            }),
+        }),
+        unsaveVideoCallURL: builder.mutation({
+            query: ({ access_token }) => ({
+                url: 'videoCallURL/',
+                method: 'PUT',
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                },
+            }),
+        }),
+
+
     })
 })
 
@@ -182,4 +203,6 @@ export const {
     useGetWishlistQuery,
     useAddToWishlistMutation,
     useRemoveFromWishlistMutation,
+    useSaveVideoCallURLMutation,
+    useUnsaveVideoCallURLMutation,
 } = api

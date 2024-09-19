@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import SignUp,SignIn, Dashboard, GetAllUsers,BecomeTrainee, UpdateProfile, GetAllProductsByCategory, ChangePasswordView
+from .views import SignUp,SignIn, Dashboard, GetAllUsers,BecomeTrainee, UpdateProfile, GetAllProductsByCategory, ChangePasswordView, videoCall, SaveVideoCallURL
 
 urlpatterns = [
     path('signUp/', SignUp.as_view(), name='signUp'),
@@ -10,4 +10,6 @@ urlpatterns = [
     path('updateProfile/', UpdateProfile.as_view(), name='updateProfile'),
     path('products/', GetAllProductsByCategory.as_view(), name='get_all_products_by_category'),
     path('changePassword/', ChangePasswordView.as_view(), name='change_password'),
+    path('videoCall/', videoCall, name='videoCall'),
+    path('videoCallURL/', SaveVideoCallURL.as_view(), name='saveVideoCallURL'),
 ]

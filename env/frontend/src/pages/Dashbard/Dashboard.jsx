@@ -6,7 +6,8 @@ import Grid from '@mui/material/Grid2';
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
 import { useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
-
+import { getToken } from '../../services/localStorage';
+import { useMediaQuery } from '@mui/material';
 // Configuration
 const theme = createTheme({
     typography: {
@@ -28,6 +29,7 @@ const modalStyle = {
 
 const Dashboard = () => {
     const user = useSelector((state) => state.user);
+
     const [openTraineesModal, setOpenTraineesModal] = useState(false);
     const [openTrainersModal, setOpenTrainersModal] = useState(false);
 
@@ -35,12 +37,12 @@ const Dashboard = () => {
     const handleCloseTraineesModal = () => setOpenTraineesModal(false);
     const handleOpenTrainersModal = () => setOpenTrainersModal(true);
     const handleCloseTrainersModal = () => setOpenTrainersModal(false);
-
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
     return (
         <ThemeProvider theme={theme}>
             <Navbar />
             <Box sx={{ display: 'flex' }}>
-                <LeftNavbar />
+                {!isSmallScreen && <LeftNavbar />}
                 <Box
                     sx={{
                         flexGrow: 1,
@@ -52,38 +54,51 @@ const Dashboard = () => {
                         width: '65vw'
                     }}
                 >
-                    <Typography variant="h4" component="div" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
+                    <Typography variant="h4" component="div" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textAlign: 'start' }}>
                         Dashboard
                     </Typography>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12}>
+                    <Grid container justifyContent="center">
+                        <Grid item xs={12} md={8}>
                             <Card sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
                                 <CardContent>
-                                    <Box display="flex" alignItems="center" mb={3}>
+                                    <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
                                         <Avatar
                                             src={user.avatar}
-                                            sx={{ width: 100, height: 100, mr: 3 }}
+                                            sx={{ width: 150, height: 150, mb: 2 }}
                                         />
-                                        <Box>
-                                            <Typography variant="h5" sx={{ fontWeight: 600 }}>{user.name}</Typography>
-                                            <Typography variant="body1">@{user.username}</Typography>
-                                        </Box>
+                                        <Typography variant="h5" sx={{ fontWeight: 600 }}>{user.name}</Typography>
+                                        <Typography variant="body1" sx={{ mb: 2 }}>@{user.username}</Typography>
+                                        <Typography variant="body1" sx={{ mb: 2, textAlign: 'center', maxWidth: '80%' }}>
+                                            {user.description ? user.description : "No description available"}
+                                        </Typography>
                                     </Box>
-                                    <Box sx={{ mt: 2 }}>
-                                        <Typography variant="body1"><strong>Email:</strong> {user.email}</Typography>
-                                        <Typography variant="body1"><strong>Age:</strong> {user.age}</Typography>
-                                        <Typography variant="body1"><strong>User Type:</strong> {user.is_trainer ? "Trainer" : "General"}</Typography>
-                                        <Typography variant="body1"><strong>Trainers:</strong> {user.trainers.length}</Typography>
-                                        <Button variant="contained" onClick={handleOpenTrainersModal} sx={{ mt: 2, mr: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
+                                    <Grid container spacing={2} sx={{ mt: 2 }} justifyContent="center">
+                                        <Grid item xs={12} sm={6}>
+                                            <Typography variant="body1" align="center"><strong>Email:</strong> {user.email}</Typography>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Typography variant="body1" align="center"><strong>Age:</strong> {user.age}</Typography>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Typography variant="body1" align="center"><strong>User Type:</strong> {user.is_trainer ? "Trainer" : "General"}</Typography>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Typography variant="body1" align="center"><strong>Trainers:</strong> {user.trainers.length}</Typography>
+                                        </Grid>
+                                        {user.is_trainer && (
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="body1" align="center"><strong>Number of Trainees:</strong> {user.trainees ? user.trainees.length : 0}</Typography>
+                                            </Grid>
+                                        )}
+                                    </Grid>
+                                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                                        <Button variant="contained" onClick={handleOpenTrainersModal} sx={{ mr: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
                                             View Trainers
                                         </Button>
                                         {user.is_trainer && (
-                                            <>
-                                                <Typography variant="body1"><strong>Number of Trainees:</strong> {user.trainees ? user.trainees.length : 0}</Typography>
-                                                <Button variant="contained" onClick={handleOpenTraineesModal} sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
-                                                    View Trainees
-                                                </Button>
-                                            </>
+                                            <Button variant="contained" onClick={handleOpenTraineesModal} sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}>
+                                                View Trainees
+                                            </Button>
                                         )}
                                     </Box>
                                 </CardContent>

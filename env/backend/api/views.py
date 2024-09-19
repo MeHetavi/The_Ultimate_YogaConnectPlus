@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Person, Category, Product, ProductImage
 from .serializers import (
@@ -13,7 +14,6 @@ from .serializers import (
 from django.contrib.auth import authenticate
 from .renderers import PersonRenderer
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -147,3 +147,30 @@ class ChangePasswordView(APIView):
             return Response({"message": "Password changed successfully."}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+@api_view(['GET'])
+def videoCall(request):
+    # if access_token:
+    # print(access_token)
+    context = {
+        'username': request.user.username,
+        'user_id': str(request.user.id)  # Convert to string to ensure it's JSON serializable
+    }
+    return render(request, 'VideoCall.html', context)
+
+class SaveVideoCallURL(APIView):
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [PersonRenderer]
+
+    def post(self, request, format=None):
+        url = request.data.get('url')
+        request.user.video_call_url = url
+        request.user.save()
+        return Response(status=status.HTTP_200_OK)
+    
+    def put(self, request, format=None):
+        request.user.video_call_url = None
+        request.user.save()
+        return Response(status=status.HTTP_200_OK)

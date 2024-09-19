@@ -15,3 +15,4 @@ npm install react-redux
 npm i framer-motion
 npm i gsap
 npm install react-easy-crop
+pip install django-cors-headers

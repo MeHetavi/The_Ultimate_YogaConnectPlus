@@ -1,57 +1,20 @@
-// import { Box, Card, CardContent, Divider, Avatar, Typography } from "@mui/material";
-// import { motion, AnimatePresence } from 'framer-motion';
-// import { Link } from "react-router-dom";
-// const ProfileCard = ({ profile }) => (
-//     <motion.div
-//         whileHover={{ scale: 1.05 }}
-
-//     >
-//         <Card className="profile-card"
-//             sx={{
-//                 boxShadow: 'rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset'
-//             }}
-
-//         >
-//             <CardContent
-
-//             >
-//                 <Avatar
-//                     alt="Remy Sharp"
-//                     // src={profile_pic}
-//                     sx={{
-//                         display: 'block',
-//                         marginRight: '40%',
-//                         marginLeft: '40%',
-//                     }}
-//                 />
-//                 <Typography gutterBottom variant="h6" component="div">
-//                     {profile.username}
-//                 </Typography>
-//                 <Divider />
-//                 {profile.name}
-//                 <Typography variant="body2" color="text.secondary">
-//                     {profile.description}
-//                 </Typography>
-//                 <Link to={`/profile/${profile.username}`} >View</Link>
-//             </CardContent>
-//         </Card>
-//     </motion.div >
-// );
-
-// export default ProfileCard;
-
 import React from "react";
-import { Box, Typography, Avatar } from "@mui/material";
+import { Box, Typography, Avatar, useTheme, useMediaQuery } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const ProfileCard = ({ profile }) => {
+    const theme = useTheme();
+    const isXsScreen = useMediaQuery(theme.breakpoints.only('xs'));
+    const isSmScreen = useMediaQuery(theme.breakpoints.only('sm'));
+
     return (
         <Box
             sx={{
                 backgroundColor: "#96c9d9",
-                margin: '10px',
-                width: "20vw",
-                padding: "25px 20px",
+                margin: { xs: '5px', sm: '8px', md: '10px' },
+                width: { xs: '90%', sm: '85%', md: '80%' },
+                maxWidth: '300px',
+                padding: { xs: '15px', sm: '20px', md: '25px' },
                 border: "4px solid #acd6e2",
                 boxShadow: "0 6px 10px rgba(207, 212, 222, 1)",
                 borderRadius: "10px",
@@ -63,16 +26,18 @@ const ProfileCard = ({ profile }) => {
                     transform: "translateY(-10px)",
                 },
                 display: 'flex',
-                justifyContent: 'center'
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto', // Center the card horizontally
             }}
         >
-
             <Avatar
                 sx={{
-                    width: "5rem",
-                    height: "5rem",
+                    width: { xs: '4rem', sm: '4.5rem', md: '5rem' },
+                    height: { xs: '4rem', sm: '4.5rem', md: '5rem' },
                     border: "4px solid #acd6e2",
-                    margin: "0 auto",
+                    marginBottom: '10px',
                 }}
                 src={profile.avatar}
             >
@@ -86,25 +51,47 @@ const ProfileCard = ({ profile }) => {
                 </svg>
             </Avatar>
 
-
             <Typography
                 variant="h6"
-                sx={{ marginTop: "20px", fontWeight: "600", fontSize: "18px" }}
+                sx={{
+                    marginTop: '10px',
+                    fontWeight: "600",
+                    fontSize: { xs: '16px', sm: '17px', md: '18px' },
+                    wordBreak: 'break-word',
+                }}
             >
-                <br />
-                <Link to={`profile/${profile.username}`}>{profile.username}</Link>
-
+                <Link
+                    to={`profile/${profile.username}`}
+                    style={{ color: '#fff', textDecoration: 'none' }}
+                >
+                    {profile.username}
+                </Link>
             </Typography>
-            <br />
+
             <Box
                 sx={{
                     position: "relative",
                     width: "100%",
                     height: "2px",
-                    margin: "20px 0",
+                    margin: "15px 0",
                     backgroundColor: "#7cdacc",
                 }}
             />
+
+            {!isXsScreen && (
+                <Typography
+                    variant="body2"
+                    sx={{
+                        fontSize: { xs: '12px', sm: '13px', md: '14px' },
+                        color: '#f0f0f0',
+                        mt: '10px',
+                    }}
+                >
+                    {profile.description ? (
+                        isSmScreen ? profile.description.slice(0, 50) + '...' : profile.description
+                    ) : 'No description available'}
+                </Typography>
+            )}
         </Box>
     );
 };

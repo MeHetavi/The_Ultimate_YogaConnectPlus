@@ -11,6 +11,8 @@ const initialState = {
     trainees: [],
     trainers: [],  // New field
     avatar: null,
+    video_call_url: null,
+    description: null,
 }
 
 export const userSlice = createSlice({
@@ -27,6 +29,8 @@ export const userSlice = createSlice({
             state.trainees = action.payload.trainees
             state.trainers = action.payload.trainers
             state.avatar = getFullAvatarPath(action.payload.avatar)
+            state.video_call_url = action.payload.video_call_url
+            state.description = action.payload.description
         },
         unsetUserInfo: (state) => {
             state.username = ''
@@ -38,6 +42,8 @@ export const userSlice = createSlice({
             state.trainees = []
             state.trainers = []
             state.avatar = null
+            state.video_call_url = null
+            state.description = null
         },
     }
 })

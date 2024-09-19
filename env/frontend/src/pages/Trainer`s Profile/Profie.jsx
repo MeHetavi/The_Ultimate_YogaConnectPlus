@@ -119,6 +119,11 @@ const Dashboard = () => {
                             {/* {isLoading ? 'Processing...' : 'Become Trainee'} */}
                             {is_trainee ? 'Already a Trainee' : 'Become Trainee'}
                         </Button>
+                        {is_trainee && profile.video_call_url && (
+                            <Button onClick={() => window.open(profile.video_call_url, '_blank')} variant="contained" color="primary" sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif' }}>
+                                Join Video Call
+                            </Button>
+                        )}
                         {error && <Typography color="error">{error.message}</Typography>}
                     </Typography>
                 </Box>

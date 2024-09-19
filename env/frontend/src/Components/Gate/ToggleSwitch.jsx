@@ -1,34 +1,46 @@
-import { Switch } from "@mui/material";
-import { styled } from "@mui/material";
+import React from 'react';
+import { Switch, styled } from "@mui/material";
 
-const GateToggleSwitch = styled(Switch)(({ theme, isFlipped }) => ({
-    boxSizing: 'border-box',
-    borderRadius: '5px',
-    border: `2px solid var(--main-color)`,
-    boxShadow: `4px 4px var(--main-color)`,
-    // position: 'absolute',
-    cursor: 'none',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'var(--bg-color)',
-    // transform: 'translateY(-200px)',
-    transition: '0.3s',
-    '&:before': {
+const GateToggleSwitch = styled(Switch)(({ theme }) => ({
+    width: 60,
+    height: 40,
+    padding: 7,
+    '& .MuiSwitch-switchBase': {
+        padding: 0,
+        margin: 2,
+        transitionDuration: '300ms',
+        '&.Mui-checked': {
+            transform: 'translateX(26px)',
+            color: '#fff',
+            '& + .MuiSwitch-track': {
+                backgroundColor: 'var(--bg-color)',
+                opacity: 1,
+                border: '2px solid var(--main-color)',
+            },
+        },
+    },
+    '& .MuiSwitch-thumb': {
         boxSizing: 'border-box',
-        position: 'absolute',
-        content: '""',
-        height: '20px',
-        width: '20px',
-        border: `2px solid var(--main-color)`,
+        width: 25,
+        height: 25,
+        border: '2px solid var(--main-color)',
         borderRadius: '5px',
-        left: isFlipped ? '30px' : '-2px', // Adjusted position based on the toggle state
-        bottom: '2px',
         backgroundColor: 'var(--bg-color)',
-        boxShadow: `0 3px 0 var(--main-color)`,
-        transition: '0.3s',
+    },
+    '& .MuiSwitch-track': {
+        borderRadius: 5,
+        backgroundColor: 'var(--bg-color)',
+        opacity: 1,
+        border: '2px solid var(--main-color)',
+        boxShadow: '4px 4px var(--main-color)',
+        transition: theme.transitions.create(['background-color'], {
+            duration: 500,
+        }),
     },
 }));
 
-export default GateToggleSwitch;
+const ToggleSwitch = ({ checked, onChange }) => {
+    return <GateToggleSwitch checked={checked} onChange={onChange} />;
+};
+
+export default ToggleSwitch;

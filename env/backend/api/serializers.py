@@ -42,7 +42,7 @@ class PersonDashboardSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Person
-        fields = ['username', 'email', 'name', 'age', 'gender', 'is_trainer', 'trainees', 'avatar', 'trainers']
+        fields = ['username', 'email', 'name', 'age', 'gender', 'is_trainer', 'trainees', 'avatar', 'trainers', 'description','video_call_url']
 
     def get_trainers(self, obj):
         return get_trainers(obj)
@@ -50,7 +50,7 @@ class PersonDashboardSerializer(serializers.ModelSerializer):
 class GetAllUsersSeializer(serializers.ModelSerializer) :
   class Meta:
     model = Person
-    fields = ['username', 'email', 'name','is_trainer','trainees','age','gender','avatar']
+    fields = ['username', 'email', 'name','is_trainer','trainees','age','gender','avatar','video_call_url','description']
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
     # avatar = serializers.ImageField(required=False, allow_null=True)
@@ -58,7 +58,7 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Person
-        fields = ['name', 'age', 'gender', 'email', 'username', 'avatar', 'remove_avatar']
+        fields = ['name', 'age', 'gender', 'email', 'username', 'avatar', 'remove_avatar', 'description']
 
     def validate_email(self, value):
         user = self.instance

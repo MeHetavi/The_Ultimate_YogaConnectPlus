@@ -12,6 +12,7 @@ import { getToken } from '../../services/localStorage';
 import { useGetUsersQuery } from '../../services/api';
 import { Link } from 'react-router-dom';
 import { Avatar } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 // Configuration
 const API_BASE_URL = 'http://localhost:8000';  // Adjust this to match your backend URL
@@ -87,7 +88,6 @@ const Explore = () => {
     return (
         <>
             <Navbar />
-
             <div className="search-bar-wrapper" style={{ marginTop: '5vh' }}>
                 <div className="input__container">
                     <div className="shadow__input"></div>
@@ -175,7 +175,8 @@ const Explore = () => {
                         fontFamily: "Montserrat",
                         textAlign: 'center',
                         fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '35px' },
-                        marginTop: filteredProfiles.length > 0 ? '5vh' : '10vh'
+                        marginTop: filteredProfiles.length > 0 ? '5vh' : '10vh',
+                        marginBottom: '3vh', // Add some bottom margin
                     }}
                 >
                     Top Trainers
@@ -186,12 +187,29 @@ const Explore = () => {
                 initial={{ x: '100vw' }}
                 animate={{ x: 0 }}
                 transition={{ duration: 1.5, type: "tween", stiffness: 120 }}
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%',
+                    padding: '0 2rem',
+                }}
             >
-                <Box className="scroll-container">
+                <Grid
+                    container
+                    spacing={3}
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{
+                        maxWidth: { xs: '100%', sm: '80%', md: '90%', lg: '80%' },
+                        margin: '0 auto',
+                    }}
+                >
                     {profiles.users && profiles.users.map((profile, index) => (
-                        <ProfileCard key={index} profile={profile} />
+                        <Grid item xs={12} sm={6} md={4} key={index}>
+                            <ProfileCard profile={profile} />
+                        </Grid>
                     ))}
-                </Box>
+                </Grid>
             </motion.div>
 
             <Footer />

@@ -25,7 +25,14 @@ import WishlistButton from './WishlistButton';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
-import { useGetLoggedUserQuery } from '../../services/api';
+import { useMediaQuery } from '@mui/material';
+import createTheme from '@mui/material/styles/createTheme';
+
+const theme = createTheme({
+    typography: {
+        fontFamily: 'Montserrat, sans-serif',
+    },
+});
 
 function HideOnScroll(props) {
     const { children, window } = props;
@@ -53,8 +60,12 @@ export default function Navbar(props) {
         { name: 'Explore', link: '/explore' },
         { name: 'Shop', link: '/shop' }
     ];
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
     const settings = [
-        { name: 'Dashboard', link: '/dashboard' },
+        {
+            name: 'Dashboard',
+            link: isSmallScreen ? 'dashboardNav' : '/dashboard'
+        },
     ];
 
     const [drawerOpen, setDrawerOpen] = React.useState(false);

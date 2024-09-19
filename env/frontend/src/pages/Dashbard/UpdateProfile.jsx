@@ -10,6 +10,7 @@ import { getToken } from '../../services/localStorage';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../features/userSlice';
 import { getFullAvatarPath } from '../../services/localStorage';
+import { useMediaQuery } from '@mui/material';
 
 // Create a theme
 const theme = createTheme({
@@ -40,7 +41,8 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
         fontWeight: '400',
         fontFamily: 'Montserrat, sans-serif',
         width: '100%',
-        height: '2.75rem',
+        height: 'auto', // Allow height to adjust based on content
+        minHeight: '2.75rem',
         padding: '0 0.75rem',
         border: `1px solid ${theme.palette.grey[300]}`,
         borderRadius: '0.5rem',
@@ -63,6 +65,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
         padding: '0.5rem 0',
         fontWeight: '400',
         fontFamily: 'Montserrat, sans-serif',
+    },
+
+    '& .MuiInputBase-inputMultiline': {
+        padding: '0.5rem 0.75rem',
     },
 
     '& .MuiOutlinedInput-notchedOutline': {
@@ -94,6 +100,13 @@ const UpdateProfile = (props) => {
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [isCropping, setIsCropping] = useState(false);
     const [errors, setErrors] = useState({});
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success'
+    });
 
     useEffect(() => {
         if (data.username !== '') {
@@ -187,26 +200,21 @@ const UpdateProfile = (props) => {
             setEditedUser(result);
             setAvatar(null);
 
-            setSnackbarMessage("Avatar removed successfully!");
-            setSnackbarSeverity('success');
-            setOpenSnackbar(true);
-
-            setTimeout(() => {
-                setOpenSnackbar(false);
-            }, 6000);
+            setSnackbar({
+                open: true,
+                message: "Avatar removed successfully!",
+                severity: 'success'
+            });
 
         } catch (error) {
             console.error('Failed to remove avatar:', error);
-            setSnackbarMessage("Failed to remove avatar. Please try again.");
-            setSnackbarSeverity('error');
-            setOpenSnackbar(true);
-
-            setTimeout(() => {
-                setOpenSnackbar(false);
-            }, 6000);
+            setSnackbar({
+                open: true,
+                message: "Failed to remove avatar. Please try again.",
+                severity: 'error'
+            });
         }
     };
-
     const handleUpdate = async () => {
         try {
             const formData = new FormData();
@@ -234,28 +242,29 @@ const UpdateProfile = (props) => {
             setAvatar(null);
             setErrors({});
 
-            setSnackbarMessage("Profile updated successfully!");
-            setSnackbarSeverity('success');
-            setOpenSnackbar(true);
-
-            setTimeout(() => {
-                setOpenSnackbar(false);
-            }, 6000);
+            setSnackbar({
+                open: true,
+                message: "Profile updated successfully!",
+                severity: 'success'
+            });
 
         } catch (error) {
             console.error('Failed to update user:', error);
             console.error('Error response:', error.data);
             if (error.data && typeof error.data === 'object') {
                 setErrors(error.data.errors);
+                setSnackbar({
+                    open: true,
+                    message: "Please correct the errors in the form.",
+                    severity: 'error'
+                });
             } else {
-                setSnackbarMessage(`Failed to update profile: ${error.data?.detail || 'Please try again.'}`);
-                setSnackbarSeverity('error');
-                setOpenSnackbar(true);
+                setSnackbar({
+                    open: true,
+                    message: `Failed to update profile: ${error.data?.detail || 'Please try again.'}`,
+                    severity: 'error'
+                });
             }
-
-            setTimeout(() => {
-                setOpenSnackbar(false);
-            }, 6000);
         }
     };
 
@@ -270,15 +279,28 @@ const UpdateProfile = (props) => {
         if (reason === 'clickaway') {
             return;
         }
-        setOpenSnackbar(false);
+        setSnackbar(prev => ({ ...prev, open: false }));
     };
+
+
 
     return (
         access_token ?
             <ThemeProvider theme={theme}>
                 <Navbar />
                 <Box sx={{ display: 'flex' }}>
-                    <LeftNavbar />
+                    {!isSmallScreen && <LeftNavbar />}
+                    <Snackbar
+                        open={snackbar.open}
+                        autoHideDuration={6000}
+                        onClose={handleCloseSnackbar}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+
+                    >
+                        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                            {snackbar.message}
+                        </Alert>
+                    </Snackbar>
                     <Box
                         sx={{
                             flexGrow: 1,
@@ -343,8 +365,9 @@ const UpdateProfile = (props) => {
                                                     { name: 'name', label: 'Name', type: 'text' },
                                                     { name: 'age', label: 'Age', type: 'number' },
                                                     { name: 'email', label: 'Email', type: 'email' },
+                                                    { name: 'description', label: 'Description', type: 'text', multiline: true, minRows: 2, maxRows: 10, column: 12 },
                                                 ].map((field, index) => (
-                                                    <Grid item xs={12} sm={6} key={field.name}>
+                                                    <Grid item xs={12} sm={field.name === 'description' ? 12 : 6} key={field.name}>
                                                         <StyledTextField
                                                             fullWidth
                                                             label={field.label}
@@ -356,6 +379,9 @@ const UpdateProfile = (props) => {
                                                             margin="normal"
                                                             placeholder={`Enter ${field.label.toLowerCase()}`}
                                                             error={!!errors[field.name]}
+                                                            multiline={field.multiline}
+                                                            minRows={field.minRows}
+                                                            maxRows={field.maxRows}
                                                         />
                                                         {errors[field.name] && <ErrorText>{errors[field.name]}</ErrorText>}
                                                     </Grid>
@@ -400,16 +426,8 @@ const UpdateProfile = (props) => {
                         </Grid>
                     </Box>
                 </Box>
-                <Snackbar
-                    open={openSnackbar}
-                    autoHideDuration={6000}
-                    onClose={handleCloseSnackbar}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                >
-                    <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                        {snackbarMessage}
-                    </Alert>
-                </Snackbar>
+
+
                 <Modal open={isCropping} onClose={() => setIsCropping(false)}>
                     <Box sx={{
                         position: 'absolute',

@@ -9,7 +9,7 @@ import { useLoginUserMutation } from '../../services/api.js'
 import { Alert } from "@mui/material";
 import Snackbar from '@mui/material/Snackbar';
 import LinearProgress from '@mui/material/LinearProgress';
-
+import { Link } from 'react-router-dom';
 export default function SignIn() {
     const [serverError, setServerError] = useState({});
     const navigate = useNavigate();
@@ -71,7 +71,7 @@ export default function SignIn() {
                 sx={{
                     transform: 'rotateY(0deg)',
                     width: '384px',
-                    alignItems: 'center'
+                    alignItems: 'center',
                 }}
             >
                 <Typography variant="h5" sx={{ fontWeight: 900, color: 'var(--main-color)' }}>
@@ -83,6 +83,13 @@ export default function SignIn() {
                     <FlipCardButton type="submit">Let`s go!</FlipCardButton>
                     {serverError.non_field_errors ? <Alert severity='error'>{serverError.non_field_errors}</Alert> : ''}
                 </form>
+                <Typography
+                    sx={{
+                        fontWeight: 700,
+                        color: 'black',
+                        textDecoration: 'none',
+                    }}
+                    variant="body1" ><Link to="/" sx={{ fontWeight: 700 }}>Home</Link></Typography>
             </FlipCardSide>
 
             <Snackbar

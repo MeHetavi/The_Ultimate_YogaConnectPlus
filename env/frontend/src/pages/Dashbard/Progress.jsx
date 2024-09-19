@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent } from '@mui/material';
+import { Box, Typography, Card, CardContent, createTheme } from '@mui/material';
 import { LocalFireDepartment, Favorite, DirectionsRun, NightsStay } from '@mui/icons-material';
 import Navbar from '../../Components/Skeleton/Navbar';
 import Grid from '@mui/material/Grid2';
 import Footer from '../../Components/Skeleton/Footer';
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
 import { useSelector } from 'react-redux';
+import { useMediaQuery } from '@mui/material';
+
+
+const theme = createTheme({
+    typography: {
+        fontFamily: 'Montserrat, sans-serif',
+    },
+});
 
 const MetricCard = ({ title, value, icon, color }) => (
     <Card
@@ -71,6 +79,7 @@ const DietPlanCard = ({ day, title, description, imageUrl }) => (
 const Progress = () => {
     const data = useSelector((state) => state.user);
     const [user, setUser] = useState({})
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
         console.log('data', data)
@@ -91,7 +100,7 @@ const Progress = () => {
                         display: 'flex'
                     }}
                 >
-                    <LeftNavbar />
+                    {!isSmallScreen && <LeftNavbar />}
 
                     {/* Original First Box (now second) */}
                     <Box

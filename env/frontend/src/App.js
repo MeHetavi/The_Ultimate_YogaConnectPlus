@@ -16,9 +16,30 @@ import NotFound from './pages/Error/NotFound';
 import { useSelector } from 'react-redux';
 import Cart from './pages/Shop/Cart';
 import Wishlist from './pages/Shop/Wishlist';
+import VideoCall from './pages/Dashbard/VideoCall';
+import LeftNavbar from './Components/Skeleton/LeftNavbar';
+
+
 
 function App() {
   const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const handlePageRefresh = () => {
+      if (window.performance && window.performance.navigation.type === 1) {
+        // Navigation type 1 indicates a page refresh
+        window.location.href = '/';
+      }
+    };
+
+    handlePageRefresh(); // Check on initial load
+    window.addEventListener('load', handlePageRefresh);
+
+    return () => {
+      window.removeEventListener('load', handlePageRefresh);
+    };
+  }, []);
+
   // Helper function to render protected routes
   const ProtectedRoute = ({ element }) => {
     return user ? element : <Navigate to="/404" replace />;
@@ -35,6 +56,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/gate" element={<Gate />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/dashboardNav" element={<LeftNavbar />} />
           <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} />} />
           <Route path="/progress" element={<ProtectedRoute element={<Progress />} />} />
           <Route path="/updateProfile" element={<ProtectedRoute element={<UpdateProfile />} />} />
@@ -44,8 +66,10 @@ function App() {
           <Route path="/shop/:genere" element={<ShopByGenere />} />
           <Route path="/orders" element={<ProtectedRoute element={<Orders />} />} />
           <Route path="/changePassword" element={<ProtectedRoute element={<ChangePassword />} />} />
+          <Route path="/videoCall" element={<VideoCall />} />
           <Route path="/cart" element={<ProtectedRoute element={<Cart />} />} />
           <Route path="/wishlist" element={<ProtectedRoute element={<Wishlist />} />} />
+
           {/* 404 Route */}
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" replace />} />

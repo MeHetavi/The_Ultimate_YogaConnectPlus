@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid2';
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
 import { useChangePasswordMutation } from '../../services/api';
 import { getToken } from '../../services/localStorage';
-
+import { useMediaQuery } from '@mui/material';
 // Create a theme
 const theme = createTheme({
     typography: {
@@ -83,7 +83,7 @@ export default function ChangePassword() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [errors, setErrors] = useState({});
-
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
@@ -133,7 +133,7 @@ export default function ChangePassword() {
         <ThemeProvider theme={theme}>
             <Navbar />
             <Box sx={{ display: 'flex' }}>
-                <LeftNavbar />
+                {!isSmallScreen ? <LeftNavbar /> : <></>}
                 <Box
                     sx={{
                         flexGrow: 1,

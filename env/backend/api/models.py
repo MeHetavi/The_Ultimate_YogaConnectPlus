@@ -49,7 +49,7 @@ class Person(AbstractBaseUser):
     name = models.CharField(max_length=100)
     age = models.PositiveIntegerField()
     gender = models.CharField(max_length=10)
-    # description = models.CharField(max_length=1000)
+    description = models.CharField(max_length=1000, null=True, blank=True)
     is_trainer = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -57,10 +57,10 @@ class Person(AbstractBaseUser):
     avatar = models.ImageField(upload_to='avatars', null=True, blank=True)
     trainees = models.ManyToManyField('self',symmetrical=False, related_name='trainee_set')
     objects = PersonManager()
-
+    video_call_url = models.CharField(max_length=1000, null=True, blank=True)
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email", "name", "age", "gender", "is_trainer"]
-
+    
     def __str__(self):
         return self.username
 

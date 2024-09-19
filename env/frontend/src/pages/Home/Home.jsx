@@ -55,6 +55,7 @@ export default function Home() {
                 posts: data.posts,
                 avatar: data.avatar,
                 trainers: data.trainers,
+                description: data.description,
             }))
         }
     }, [data, access_token])

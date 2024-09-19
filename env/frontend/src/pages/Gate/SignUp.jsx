@@ -11,7 +11,7 @@ import { Box, RadioGroup, Radio, FormControlLabel } from "@mui/material";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
-
+import { Link } from 'react-router-dom';
 const Option = styled(Box)(({ checked }) => ({
     marginRight: '5px',
     width: '80.5px',
@@ -292,6 +292,8 @@ export default function SignUp() {
                     </Alert>
                 </Snackbar>
             </FlipCardSide>
+            <Link to="/">Home</Link>
+
         </>
     );
 }

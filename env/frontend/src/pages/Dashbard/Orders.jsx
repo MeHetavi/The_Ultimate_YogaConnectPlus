@@ -1,14 +1,22 @@
 import React from 'react'
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
 import Navbar from '../../Components/Skeleton/Navbar';
-import { Box } from '@mui/material';
+import { Box, Typography, createTheme } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
+
+const theme = createTheme({
+    typography: {
+        fontFamily: 'Montserrat, sans-serif',
+    },
+});
 
 export default function Orders() {
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
     return (
         <div>
             <Navbar />
             <Box sx={{ display: 'flex' }}>
-                <LeftNavbar />
+                {!isSmallScreen && <LeftNavbar />}
                 <Box
                     sx={{
                         flexGrow: 1,
@@ -20,10 +28,11 @@ export default function Orders() {
                         width: '65vw'
                     }}
                 >
-
+                    <Typography variant="h4" component="div" gutterBottom sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
+                        Orders
+                    </Typography>
                 </Box>
             </Box>
-            <h1>Orders</h1>
         </div>
     )
 }
