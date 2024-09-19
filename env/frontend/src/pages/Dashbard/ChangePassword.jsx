@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Button, ThemeProvider, createTheme, styled, Snackbar, Alert, TextField } from '@mui/material';
+import { Box, Typography, Card, CardContent, ThemeProvider, createTheme, styled, Snackbar, Alert, TextField } from '@mui/material';
 import Navbar from '../../Components/Skeleton/Navbar';
 import Grid from '@mui/material/Grid2';
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
 import { useChangePasswordMutation } from '../../services/api';
 import { getToken } from '../../services/localStorage';
 import { useMediaQuery } from '@mui/material';
+import SubscribeButton from '../../Components/Button';
+
 // Create a theme
 const theme = createTheme({
     typography: {
@@ -197,14 +199,11 @@ export default function ChangePassword() {
                                                 </Grid>
                                             </Grid>
                                             <Box mt={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                                <Button
+                                                <SubscribeButton
                                                     type="submit"
-                                                    variant="contained"
-                                                    color="primary"
-                                                    sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
                                                 >
                                                     Change Password
-                                                </Button>
+                                                </SubscribeButton>
                                             </Box>
                                         </form>
                                     </Box>

@@ -9,6 +9,11 @@ import { useBecomeTraineeMutation } from '../../services/api';
 import { getToken } from '../../services/localStorage';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../features/userSlice';
+import SubscribeButton from '../../Components/Button'; // Import the custom Button component
+import { Modal, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { Link as RouterLink } from 'react-router-dom';
+
 const StyledTypography = styled(Typography)(() => ({
     fontFamily: 'Montserrat',
 }));
@@ -24,6 +29,7 @@ const Dashboard = () => {
     const user = useSelector((state) => state.user);
     const dispatch = useDispatch();
     let foundUser = null;
+    const [openTraineesModal, setOpenTraineesModal] = useState(false);
 
     useEffect(() => {
         foundUser = users.find((u) => u.username === username);
@@ -64,70 +70,133 @@ const Dashboard = () => {
             }
         }
     };
+
+    const handleOpenTraineesModal = () => setOpenTraineesModal(true);
+    const handleCloseTraineesModal = () => setOpenTraineesModal(false);
+
     return (
         <>
             <Navbar />
-            <Box
-                sx={{
-                    display: 'flex'
-                }}
+            <Box sx={{ p: 3, maxWidth: 800, margin: '0 auto' }}>
+                <Card sx={{
+                    bgcolor: 'rgba(0, 0, 0, 0.1)',
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    backdropFilter: 'blur(5px)',
+                }}>
+                    <CardContent sx={{ p: 4 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <Avatar
+                                src={profile.avatar}
+                                sx={{ width: 200, height: 200, mb: 3 }}
+                            />
+                            <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>{profile.name}</Typography>
+                            <Typography variant="h6" sx={{ mb: 3, color: 'text.secondary' }}>@{profile.username}</Typography>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                                {profile.is_trainer && (
+                                    <Box
+                                        onClick={handleOpenTraineesModal}
+                                        sx={{
+                                            cursor: 'pointer',
+                                            textAlign: 'center',
+                                            p: 2,
+                                            bgcolor: 'rgba(255, 255, 255, 0.1)',
+                                            borderRadius: '8px',
+                                            transition: 'background-color 0.3s',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                                            }
+                                        }}
+                                    >
+                                        <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
+                                            {profile.trainees ? profile.trainees.length : 0}
+                                        </Typography>
+                                        <Typography variant="body1">Trainee</Typography>
+                                    </Box>
+                                )}
+                            </Box>
+
+                            <Grid container spacing={2} sx={{ mb: 3 }}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1"><strong>Email:</strong> {profile.email}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1"><strong>Age:</strong> {profile.age}</Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="body1"><strong>User Type:</strong> {profile.is_trainer ? "Trainer" : "General"}</Typography>
+                                </Grid>
+                            </Grid>
+
+                            <Typography variant="body1" sx={{ mb: 3, textAlign: 'center' }}>{profile.description}</Typography>
+
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
+                                <SubscribeButton
+                                    onClick={handleBecomeTrainee}
+                                    disabled={isLoading || is_trainee}
+                                >
+                                    {is_trainee ? 'Already a Trainee' : 'Become Trainee'}
+                                </SubscribeButton>
+                                {is_trainee && profile.video_call_url && (
+                                    <SubscribeButton
+                                        onClick={() => window.open(profile.video_call_url, '_blank')}
+                                    >
+                                        Join Video Call
+                                    </SubscribeButton>
+                                )}
+                            </Box>
+                            {error && <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>{error.message}</Typography>}
+                        </Box>
+                    </CardContent>
+                </Card>
+            </Box>
+
+            {/* Trainees Modal */}
+            <Modal
+                open={openTraineesModal}
+                onClose={handleCloseTraineesModal}
+                aria-labelledby="trainee-list-modal"
+                aria-describedby="modal-modal-description"
             >
-                <Box
-                    sx={{
-                        flexGrow: 1,
-                        p: 3,
-                        m: 4,
-                        bgcolor: 'rgb(0,0,0,0.1)',
-                        borderRadius: '30px',
-                        height: 'fit-content',
-                        width: '65vw'
-                    }}
-                >
-                    <Grid container spacing={3}>
-                        <Grid item xs={12}>
-                            <Card sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
-                                <CardContent>
-                                    <Box display="flex" alignItems="center" mb={3}>
-                                        <Avatar
-                                            src={profile.avatar}
-                                            sx={{ width: { xs: 60, sm: 80, md: 100 }, height: { xs: 60, sm: 80, md: 100 }, mr: 3 }}
-                                        />
-                                        <Box>
-                                            <Typography variant="h5">{profile.name}</Typography>
-                                            <Typography variant="body1">@{profile.username}</Typography>
-                                        </Box>
-                                    </Box>
-                                    <Box sx={{ mt: 2 }}>
-                                        <Typography variant="body1"><strong>Email:</strong> {profile.email}</Typography>
-                                        <Typography variant="body1"><strong>Age:</strong> {profile.age}</Typography>
-                                        <Typography variant="body1"><strong>User Type:</strong> {profile.is_trainer ? "Trainer" : "General"}</Typography>
-                                        {profile.is_trainer && (
-                                            <>
-                                                <Typography variant="body1"><strong>Number of Trainees:</strong> {profile.trainees ? profile.trainees.length : 0}</Typography>
-                                                <Button variant="contained" sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif' }}>
-                                                    View Trainees
-                                                </Button>
-                                            </>
-                                        )}
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    </Grid>
-                    <Typography variant="h4" component="div">
-                        <Button onClick={handleBecomeTrainee} variant="contained" color="primary" disabled={isLoading}>
-                            {/* {isLoading ? 'Processing...' : 'Become Trainee'} */}
-                            {is_trainee ? 'Already a Trainee' : 'Become Trainee'}
-                        </Button>
-                        {is_trainee && profile.video_call_url && (
-                            <Button onClick={() => window.open(profile.video_call_url, '_blank')} variant="contained" color="primary" sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif' }}>
-                                Join Video Call
-                            </Button>
-                        )}
-                        {error && <Typography color="error">{error.message}</Typography>}
-                    </Typography>
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 400,
+                    bgcolor: 'background.paper',
+                    borderRadius: '10px',
+                    boxShadow: 24,
+                    p: 4,
+                }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        <Typography id="trainee-list-modal" variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                            Trainee List
+                        </Typography>
+                        <IconButton onClick={handleCloseTraineesModal} aria-label="close">
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    {profile.trainees && profile.trainees.length > 0 ? (
+                        <Box sx={{ maxHeight: '300px', overflowY: 'auto' }}>
+                            {profile.trainees.map((trainee, index) => (
+                                <Box key={index} sx={{ py: 1, borderBottom: '1px solid #e0e0e0' }}>
+                                    <RouterLink
+                                        to={`/profile/${trainee}`}
+                                        color="inherit"
+                                        underline="hover"
+                                    >
+                                        {trainee}
+                                    </RouterLink>
+                                </Box>
+                            ))}
+                        </Box>
+                    ) : (
+                        <Typography>No trainees found.</Typography>
+                    )}
                 </Box>
-            </Box >
+            </Modal>
         </>
     );
 };

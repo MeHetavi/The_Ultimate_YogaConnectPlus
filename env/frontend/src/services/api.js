@@ -95,74 +95,6 @@ export const api = createApi({
             },
         }),
 
-        // New endpoints for cart and wishlist
-        getCart: builder.query({
-            query: ({ access_token }) => ({
-                url: 'cart/',
-                method: 'GET',
-                headers: {
-                    'authorization': `Bearer ${access_token}`,
-                },
-            }),
-        }),
-
-        addToCart: builder.mutation({
-            query: ({ access_token, product_id }) => ({
-                url: 'cart/',
-                method: 'POST',
-                body: { product_id },
-                headers: {
-                    'authorization': `Bearer ${access_token}`,
-                    'Content-type': 'application/json',
-                },
-            }),
-        }),
-
-        removeFromCart: builder.mutation({
-            query: ({ access_token, product_id }) => ({
-                url: 'cart/',
-                method: 'DELETE',
-                body: { product_id },
-                headers: {
-                    'authorization': `Bearer ${access_token}`,
-                    'Content-type': 'application/json',
-                },
-            }),
-        }),
-
-        getWishlist: builder.query({
-            query: ({ access_token }) => ({
-                url: 'wishlist/',
-                method: 'GET',
-                headers: {
-                    'authorization': `Bearer ${access_token}`,
-                },
-            }),
-        }),
-
-        addToWishlist: builder.mutation({
-            query: ({ access_token, product_id }) => ({
-                url: 'wishlist/',
-                method: 'POST',
-                body: { product_id },
-                headers: {
-                    'authorization': `Bearer ${access_token}`,
-                    'Content-type': 'application/json',
-                },
-            }),
-        }),
-
-        removeFromWishlist: builder.mutation({
-            query: ({ access_token, product_id }) => ({
-                url: 'wishlist/',
-                method: 'DELETE',
-                body: { product_id },
-                headers: {
-                    'authorization': `Bearer ${access_token}`,
-                    'Content-type': 'application/json',
-                },
-            }),
-        }),
         saveVideoCallURL: builder.mutation({
             query: ({ access_token, url }) => ({
                 url: 'videoCallURL/',
@@ -197,12 +129,6 @@ export const {
     useUpdateProfileMutation,
     useGetProductsByCategoryQuery,
     useChangePasswordMutation,
-    useGetCartQuery,
-    useAddToCartMutation,
-    useRemoveFromCartMutation,
-    useGetWishlistQuery,
-    useAddToWishlistMutation,
-    useRemoveFromWishlistMutation,
     useSaveVideoCallURLMutation,
     useUnsaveVideoCallURLMutation,
 } = api

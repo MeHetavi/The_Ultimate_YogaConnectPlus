@@ -53,12 +53,10 @@ class GetAllUsersSeializer(serializers.ModelSerializer) :
     fields = ['username', 'email', 'name','is_trainer','trainees','age','gender','avatar','video_call_url','description']
 
 class UpdateUserProfileSerializer(serializers.ModelSerializer):
-    # avatar = serializers.ImageField(required=False, allow_null=True)
-    remove_avatar = serializers.BooleanField(required=False, write_only=True)
 
     class Meta:
         model = Person
-        fields = ['name', 'age', 'gender', 'email', 'username', 'avatar', 'remove_avatar', 'description']
+        fields = ['name', 'age', 'gender', 'email', 'username', 'avatar', 'description']
 
     def validate_email(self, value):
         user = self.instance
@@ -89,18 +87,14 @@ class UpdateUserProfileSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
-        old_password = validated_data.pop('old_password', None)
-        remove_avatar = validated_data.pop('remove_avatar', False)
-        print(remove_avatar)
+        
         for attr, value in validated_data.items():
             print(attr, value)
             setattr(instance, attr, value)
         
         if password:
             instance.set_password(password)
-        
-        if validated_data.get('remove_avatar', False):
-            instance.avatar = ''
+
         elif 'avatar' in validated_data:
             instance.avatar = validated_data['avatar']
         

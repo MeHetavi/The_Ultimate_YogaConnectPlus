@@ -13,41 +13,21 @@ import { useGetUsersQuery } from '../../services/api';
 import { Link } from 'react-router-dom';
 import { Avatar } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-
-// Configuration
-const API_BASE_URL = 'http://localhost:8000';  // Adjust this to match your backend URL
-
-// Helper function to construct the full avatar path
-const getFullAvatarPath = (avatarPath) => {
-    if (!avatarPath) return null;
-    // Remove any leading slash from avatarPath
-    const cleanPath = avatarPath.replace(/^\//, '');
-    return `${API_BASE_URL}/${cleanPath}`;
-};
+import { useSelector } from 'react-redux';
 
 const Explore = () => {
     const [profiles, setProfiles] = useState({ users: [] });
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredProfiles, setFilteredProfiles] = useState([]);
     const dispatch = useDispatch();
-    const { access_token } = getToken();
-    const { data, isLoading, isError, error } = useGetUsersQuery(access_token);
-
+    const data = useSelector(state => state.allUsersData);
     const theme = useTheme();
-    const isXs = useMediaQuery(theme.breakpoints.only('xs'));
-    const isSm = useMediaQuery(theme.breakpoints.only('sm'));
-    const isMd = useMediaQuery(theme.breakpoints.only('md'));
 
     useEffect(() => {
+        console.log(data)
         if (data) {
-            const usersArray = Array.isArray(data) ? data : (data.users || []);
-            const usersWithFullAvatarPaths = usersArray.map(user => ({
-                ...user,
-                avatar: getFullAvatarPath(user.avatar)
-            }));
-            setProfiles({ users: usersWithFullAvatarPaths });
-            setFilteredProfiles(usersWithFullAvatarPaths);
-            dispatch(setAllUsersSlice({ users: usersWithFullAvatarPaths }));
+            setFilteredProfiles(data);
+            setProfiles(data);
         }
     }, [data, dispatch]);
 
@@ -63,27 +43,7 @@ const Explore = () => {
         }
     }, [searchTerm, profiles.users]);
 
-    if (isLoading) {
-        return (
-            <>
-                <Navbar />
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-                    <CircularProgress />
-                </Box>
-            </>
-        );
-    }
 
-    if (isError) {
-        return (
-            <>
-                <Navbar />
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-                    <Typography color="error">Error: {error.message}</Typography>
-                </Box>
-            </>
-        );
-    }
 
     return (
         <>
@@ -183,34 +143,22 @@ const Explore = () => {
                 </Typography>
             </motion.div>
 
-            <motion.div
-                initial={{ x: '100vw' }}
-                animate={{ x: 0 }}
-                transition={{ duration: 1.5, type: "tween", stiffness: 120 }}
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    width: '100%',
-                    padding: '0 2rem',
+            <Grid
+                container
+                spacing={3}
+                justifyContent="center"
+                alignItems="center"
+                sx={{
+                    maxWidth: { xs: '100%', sm: '80%', md: '90%', lg: '80%' },
+                    margin: '0 auto',
                 }}
             >
-                <Grid
-                    container
-                    spacing={3}
-                    justifyContent="center"
-                    alignItems="center"
-                    sx={{
-                        maxWidth: { xs: '100%', sm: '80%', md: '90%', lg: '80%' },
-                        margin: '0 auto',
-                    }}
-                >
-                    {profiles.users && profiles.users.map((profile, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
-                            <ProfileCard profile={profile} />
-                        </Grid>
-                    ))}
-                </Grid>
-            </motion.div>
+                {profiles.users && profiles.users.map((profile, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                        <ProfileCard profile={profile} />
+                    </Grid>
+                ))}
+            </Grid>
 
             <Footer />
         </>

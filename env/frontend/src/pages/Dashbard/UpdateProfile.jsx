@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, Typography, Card, CardContent, TextField, Button, Avatar, ThemeProvider, createTheme, styled, Snackbar, Alert, Modal } from '@mui/material';
+import { Box, Typography, Card, CardContent, TextField, Avatar, ThemeProvider, createTheme, styled, Modal } from '@mui/material';
 import Cropper from 'react-easy-crop';
 import Navbar from '../../Components/Skeleton/Navbar';
 import Grid from '@mui/material/Grid2';
@@ -11,7 +11,8 @@ import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../features/userSlice';
 import { getFullAvatarPath } from '../../services/localStorage';
 import { useMediaQuery } from '@mui/material';
-
+import SubscribeButton from '../../Components/Button';
+import profile_picture from '../../Components/Images/Home1.jpg';
 // Create a theme
 const theme = createTheme({
     typography: {
@@ -91,22 +92,12 @@ const UpdateProfile = (props) => {
     const [avatar, setAvatar] = useState(null);
     const { access_token, refresh_token } = getToken()
     const [updateUser, { isLoading: isUpdating }] = useUpdateProfileMutation();
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
     const [isCropping, setIsCropping] = useState(false);
     const [errors, setErrors] = useState({});
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-    const [snackbar, setSnackbar] = useState({
-        open: false,
-        message: '',
-        severity: 'success'
-    });
 
     useEffect(() => {
         if (data.username !== '') {
@@ -179,6 +170,7 @@ const UpdateProfile = (props) => {
         });
     };
 
+
     const handleCropSave = useCallback(async () => {
         try {
             const croppedImage = await getCroppedImg(avatar, croppedAreaPixels);
@@ -189,32 +181,21 @@ const UpdateProfile = (props) => {
         }
     }, [croppedAreaPixels]);
 
-    const handleRemoveAvatar = async () => {
-        try {
-            const formData = new FormData();
-            formData.append('avatar', null);
+    // const handleRemoveAvatar = async () => {
+    //     try {
+    //         const formData = new FormData();
+    //         const blob = await response.blob();
+    //         formData.append('avatar', profile_picture);
 
-            const result = await updateUser({ access_token, data: formData }).unwrap();
-            dispatch(setUserInfo(result));
-            setUser(result);
-            setEditedUser(result);
-            setAvatar(null);
-
-            setSnackbar({
-                open: true,
-                message: "Avatar removed successfully!",
-                severity: 'success'
-            });
-
-        } catch (error) {
-            console.error('Failed to remove avatar:', error);
-            setSnackbar({
-                open: true,
-                message: "Failed to remove avatar. Please try again.",
-                severity: 'error'
-            });
-        }
-    };
+    //         const result = await updateUser({ access_token, data: formData }).unwrap();
+    //         dispatch(setUserInfo(result));
+    //         setUser(result);
+    //         setEditedUser(result);
+    //         setAvatar(null);
+    //     } catch (error) {
+    //         console.error('Failed to remove avatar:', error);
+    //     }
+    // };
     const handleUpdate = async () => {
         try {
             const formData = new FormData();
@@ -241,29 +222,11 @@ const UpdateProfile = (props) => {
             setIsEditing(false);
             setAvatar(null);
             setErrors({});
-
-            setSnackbar({
-                open: true,
-                message: "Profile updated successfully!",
-                severity: 'success'
-            });
-
         } catch (error) {
             console.error('Failed to update user:', error);
             console.error('Error response:', error.data);
             if (error.data && typeof error.data === 'object') {
                 setErrors(error.data.errors);
-                setSnackbar({
-                    open: true,
-                    message: "Please correct the errors in the form.",
-                    severity: 'error'
-                });
-            } else {
-                setSnackbar({
-                    open: true,
-                    message: `Failed to update profile: ${error.data?.detail || 'Please try again.'}`,
-                    severity: 'error'
-                });
             }
         }
     };
@@ -275,13 +238,6 @@ const UpdateProfile = (props) => {
         setErrors({});
     };
 
-    const handleCloseSnackbar = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setSnackbar(prev => ({ ...prev, open: false }));
-    };
-
 
 
     return (
@@ -290,17 +246,7 @@ const UpdateProfile = (props) => {
                 <Navbar />
                 <Box sx={{ display: 'flex' }}>
                     {!isSmallScreen && <LeftNavbar />}
-                    <Snackbar
-                        open={snackbar.open}
-                        autoHideDuration={6000}
-                        onClose={handleCloseSnackbar}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 
-                    >
-                        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-                            {snackbar.message}
-                        </Alert>
-                    </Snackbar>
                     <Box
                         sx={{
                             flexGrow: 1,
@@ -328,10 +274,9 @@ const UpdateProfile = (props) => {
                                             </Box>
                                             {isEditing && (
                                                 <>
-                                                    <Button
-                                                        variant="contained"
+                                                    <SubscribeButton
                                                         component="label"
-                                                        sx={{ height: 'fit-content', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, mr: 2 }}
+                                                        sx={{ mr: 2 }}
                                                     >
                                                         Update Avatar
                                                         <input
@@ -340,14 +285,12 @@ const UpdateProfile = (props) => {
                                                             accept="image/*"
                                                             onChange={handleAvatarChange}
                                                         />
-                                                    </Button>
-                                                    <Button
-                                                        variant="outlined"
+                                                    </SubscribeButton>
+                                                    {/* <SubscribeButton
                                                         onClick={handleRemoveAvatar}
-                                                        sx={{ height: 'fit-content', fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
                                                     >
                                                         Remove Avatar
-                                                    </Button>
+                                                    </SubscribeButton> */}
                                                 </>
                                             )}
                                         </Box>
@@ -391,33 +334,26 @@ const UpdateProfile = (props) => {
                                         <Box mt={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                                             {isEditing ? (
                                                 <>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="primary"
+                                                    <SubscribeButton
                                                         onClick={handleUpdate}
                                                         disabled={isUpdating}
-                                                        sx={{ mr: 1, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
+                                                        sx={{ mr: 1 }}
                                                     >
                                                         {isUpdating ? 'Updating...' : 'Update'}
-                                                    </Button>
-                                                    <Button
-                                                        variant="outlined"
+                                                    </SubscribeButton>
+                                                    <SubscribeButton
                                                         onClick={handleCancel}
                                                         disabled={isUpdating}
-                                                        sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
                                                     >
                                                         Cancel
-                                                    </Button>
+                                                    </SubscribeButton>
                                                 </>
                                             ) : (
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
+                                                <SubscribeButton
                                                     onClick={() => setIsEditing(true)}
-                                                    sx={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
                                                 >
                                                     Edit
-                                                </Button>
+                                                </SubscribeButton>
                                             )}
                                         </Box>
                                     </CardContent>
@@ -452,10 +388,10 @@ const UpdateProfile = (props) => {
                                 cropShape="round"
                             />
                         </div>
-                        <Button onClick={handleCropSave}>Save</Button>
+                        <SubscribeButton onClick={handleCropSave}>Save</SubscribeButton>
                     </Box>
                 </Modal>
-            </ThemeProvider>
+            </ThemeProvider >
             :
             <h1>404 Not Found</h1>
     );

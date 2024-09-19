@@ -70,7 +70,7 @@ class GetAllUsers(APIView):
     def get(self, request, format=None):
         # Filter trainers and exclude the current user
         if request.user:
-            trainers = Person.objects.filter(is_trainer=True).exclude(username=request.user.username)
+            trainers = Person.objects.filter(is_trainer=True)
         else:
             trainers = Person.objects.filter(is_trainer=True)
         serializer = GetAllUsersSeializer(trainers, many=True)

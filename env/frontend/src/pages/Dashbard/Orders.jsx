@@ -13,7 +13,7 @@ const theme = createTheme({
 export default function Orders() {
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
     return (
-        <div>
+        <>
             <Navbar />
             <Box sx={{ display: 'flex' }}>
                 {!isSmallScreen && <LeftNavbar />}
@@ -33,6 +33,6 @@ export default function Orders() {
                     </Typography>
                 </Box>
             </Box>
-        </div>
+        </>
     )
 }

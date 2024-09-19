@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
 import Navbar from '../../Components/Skeleton/Navbar';
-import { Box, Button, Typography, TextField, styled, createTheme } from '@mui/material';
+import { Box, Typography, TextField, styled, createTheme } from '@mui/material';
+import SubscribeButton from '../../Components/Button';
 import { getToken } from '../../services/localStorage';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../features/userSlice';
 import { useSaveVideoCallURLMutation, useUnsaveVideoCallURLMutation } from '../../services/api';
+import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 const theme = createTheme({
     typography: {
@@ -72,7 +74,7 @@ export default function VideoCall() {
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
     const [saveURL] = useSaveVideoCallURLMutation();
     const [removeURL] = useUnsaveVideoCallURLMutation();
-
+    const user = useSelector(state => state.user);
     const handleStartVideoCall = () => {
         window.open('http://127.0.0.1:8000/api/videoCall/', access_token);
         setCallStarted(true);
@@ -82,7 +84,10 @@ export default function VideoCall() {
         if (url) {
             try {
                 await saveURL({ url, access_token });
-                dispatch(setUserInfo(url));
+                dispatch(setUserInfo({
+                    ...user,
+                    videoCallURL: url
+                }));
             } catch (error) {
                 console.error('Error saving URL:', error);
                 // Optionally, show an error message to the user
@@ -96,7 +101,10 @@ export default function VideoCall() {
     const handleFinishVideoCall = async () => {
         try {
             await removeURL({ access_token });
-            dispatch(setUserInfo(null));
+            dispatch(setUserInfo({
+                ...user,
+                videoCallURL: null
+            }));
             setCallStarted(false);
             setUrl('');
         } catch (error) {
@@ -138,29 +146,26 @@ export default function VideoCall() {
                                 onChange={(e) => setUrl(e.target.value)}
                             />
                         </Box>
-                        <Button
-                            variant="contained"
+                        <SubscribeButton
                             onClick={handleSaveURL}
-                            sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
+                            sx={{ mt: 2, mr: 2 }}
                         >
                             Save
-                        </Button>
-                        <Button
-                            variant="contained"
+                        </SubscribeButton>
+                        <SubscribeButton
                             onClick={handleFinishVideoCall}
-                            sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
+                            sx={{ mt: 2 }}
                         >
                             Finish
-                        </Button>
+                        </SubscribeButton>
                     </>
                 ) : (
-                    <Button
-                        variant="contained"
+                    <SubscribeButton
                         onClick={handleStartVideoCall}
-                        sx={{ mt: 2, fontFamily: 'Montserrat, sans-serif', fontWeight: 600 }}
+                        sx={{ mt: 2 }}
                     >
                         Start Video Call
-                    </Button>
+                    </SubscribeButton>
                 )}
             </Box>
         </Box>

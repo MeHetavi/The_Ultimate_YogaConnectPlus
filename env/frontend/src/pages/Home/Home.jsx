@@ -17,6 +17,7 @@ import { getToken } from '../../services/localStorage.js';
 import { useGetUsersQuery } from '../../services/api.js';
 import { useSelector } from 'react-redux';
 import { setAllUsersSlice } from '../../features/allUsersSlice.js';
+import { getFullAvatarPath } from '../../services/localStorage.js';
 
 export default function Home() {
     const { access_token, refresh_token } = getToken();
@@ -36,6 +37,13 @@ export default function Home() {
             setTrainers(userTrainers);
 
             dispatch(setUserInfo({ ...data, trainers: userTrainers }));
+
+            // allUsersData.filter(user => user.username !== data.username) to remove current user from the suggestions list.
+            const usersWithFullAvatarPaths = allUsersData.filter(user => user.username !== data.username).map(user => ({
+                ...user,
+                avatar: getFullAvatarPath(user.avatar)
+            }));
+            console.log(usersWithFullAvatarPaths)
             dispatch(setAllUsersSlice({ users: usersWithFullAvatarPaths }));
         }
     }, [allUsersData, data, dispatch])
