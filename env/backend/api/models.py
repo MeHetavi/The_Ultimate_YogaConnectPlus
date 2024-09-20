@@ -53,9 +53,11 @@ class Person(AbstractBaseUser):
     is_trainer = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-
+    items_in_cart = models.ManyToManyField('Product', symmetrical=False, related_name='cart_set')
+    orders = models.ManyToManyField('Product', symmetrical=False, related_name='order_set')
     avatar = models.ImageField(upload_to='avatars', null=True, blank=True)
     trainees = models.ManyToManyField('self',symmetrical=False, related_name='trainee_set')
+    
     objects = PersonManager()
     video_call_url = models.CharField(max_length=1000, null=True, blank=True)
     USERNAME_FIELD = "username"

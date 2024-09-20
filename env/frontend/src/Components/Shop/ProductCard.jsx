@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Checkbox, Card, CardContent, CardMedia, Typography, SvgIcon, styled, Divider, Button, Box } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { useDispatch } from 'react-redux';
+import { useAddToCartMutation } from '../../services/api';
+import { getToken } from '../../services/localStorage';
+import { setUserInfo } from '../../features/userSlice';
+import { useSelector } from 'react-redux';
 
 const HeartContainer = styled(Box)({
     position: 'relative',
@@ -152,18 +157,49 @@ const CartText = styled(Typography)({
     fontSize: '10px'
 });
 
-const AddToCartButton = () => {
+
+const AddToCartButton = ({ product }) => {
+    const user = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const [addToCartMutation] = useAddToCartMutation();
+    const { access_token } = getToken();
+    const [addToCart, setAddToCart] = useState(
+        user.items_in_cart.map((item) => item.id).includes(product.id)
+    );
+    const handleAddToCart = async () => {
+        try {
+            const result = await addToCartMutation({ product_id: product.id, quantity: 1, access_token });
+            dispatch(setUserInfo(
+                {
+                    ...user,
+                    items_in_cart: [...user.items_in_cart, product]
+                }
+            ));
+            setAddToCart(true);
+        } catch (error) {
+            console.error('Failed to add item to cart:', error);
+        }
+    };
+
     return (
-        <CartButton className="CartBtn">
-            <IconContainer className="iconContainer">
-                <CartIcon component={ShoppingCartIcon} className="icon" />
-            </IconContainer>
-            <CartText className="text">Add to Cart</CartText>
-        </CartButton>
+        addToCart ?
+            <CartButton disabled={true} className="CartBtn" sx={{ backgroundColor: 'grey' }}>
+                <IconContainer className="iconContainer">
+                    <CartIcon component={ShoppingCartIcon} className="icon" />
+                </IconContainer>
+                <CartText className="text"> Added to Cart </CartText>
+            </CartButton>
+            :
+            <CartButton onClick={handleAddToCart} className="CartBtn">
+                <IconContainer className="iconContainer">
+                    <CartIcon component={ShoppingCartIcon} className="icon" />
+                </IconContainer>
+                <CartText className="text"> Add to Cart</CartText>
+            </CartButton>
+
+
     );
 };
-
-
 
 const ProductCard = ({ product }) => {
     return (
@@ -242,7 +278,7 @@ const ProductCard = ({ product }) => {
                             fontWeight: '400',
                             fontFamily: "Montserrat",
                         }}>
-                        <span style={{ color: '#666' }}>$</span> {product.price}
+                        <span style={{ color: '#666' }}>Rs</span> {product.price}
                     </Typography>
                     <HeartButton />
                 </Box>
@@ -254,7 +290,7 @@ const ProductCard = ({ product }) => {
                         alignItems: 'center',
                     }}
                 >
-                    <AddToCartButton></AddToCartButton>
+                    <AddToCartButton product={product} />
                 </Box>
 
             </CardContent>

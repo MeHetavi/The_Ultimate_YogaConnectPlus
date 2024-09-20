@@ -42,7 +42,7 @@ class PersonDashboardSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Person
-        fields = ['username', 'email', 'name', 'age', 'gender', 'is_trainer', 'trainees', 'avatar', 'trainers', 'description','video_call_url']
+        fields = ['username', 'email', 'name', 'age', 'gender', 'is_trainer', 'trainees', 'avatar', 'trainers', 'description','video_call_url', 'items_in_cart', 'orders']
 
     def get_trainers(self, obj):
         return get_trainers(obj)

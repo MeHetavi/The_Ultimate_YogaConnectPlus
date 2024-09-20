@@ -7,11 +7,18 @@ import Text from './RotatingText';
 const VideoCard = ({ videoSrc }) => {
     return (
         <Card sx={{ background: 'transparent', boxShadow: 'none' }}>
-            <CardMedia component="video" controls loop autoPlay src={videoSrc} sx={{ width: '25vw', borderRadius: '100px' }} />
+            <CardMedia
+                component="video"
+                src={videoSrc}
+                autoPlay
+                loop
+                muted
+                playsInline
+                sx={{ width: '25vw', borderRadius: '100px' }}
+            />
         </Card>
     );
 };
-
 
 const Box2 = () => {
     return (
@@ -35,10 +42,7 @@ const Box2 = () => {
                     alignSelf: 'end',
                     margin: '20px'
                 }}>
-                <VideoCard
-                    videoSrc={video}
-
-                />
+                <VideoCard videoSrc={video} />
             </Box>
 
             <Box

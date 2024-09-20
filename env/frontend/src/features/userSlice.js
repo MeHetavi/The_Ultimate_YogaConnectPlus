@@ -13,6 +13,8 @@ const initialState = {
     avatar: null,
     video_call_url: null,
     description: null,
+    items_in_cart: [],
+    orders: [],
 }
 
 export const userSlice = createSlice({
@@ -31,6 +33,8 @@ export const userSlice = createSlice({
             state.avatar = getFullAvatarPath(action.payload.avatar)
             state.video_call_url = action.payload.video_call_url
             state.description = action.payload.description
+            state.items_in_cart = action.payload.items_in_cart
+            state.orders = action.payload.orders
         },
         unsetUserInfo: (state) => {
             state.username = ''
@@ -44,6 +48,8 @@ export const userSlice = createSlice({
             state.avatar = null
             state.video_call_url = null
             state.description = null
+            state.items_in_cart = []
+            state.orders = []
         },
     }
 })

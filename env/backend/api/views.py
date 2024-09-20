@@ -53,7 +53,6 @@ class SignIn(APIView):
 class Dashboard(APIView):
     renderer_classes = [PersonRenderer]
     permission_classes = [IsAuthenticated]
-    
 
     def get(self, request, format=None):
         person_serializer = PersonDashboardSerializer(request.user)
@@ -62,6 +61,15 @@ class Dashboard(APIView):
         for id in person_serializer.data['trainees']:
             trainees.append(Person.objects.get(id=id).username)
         data['trainees'] = trainees
+
+        products = Product.objects.filter(id__in=data['items_in_cart'])
+        serializer = ProductSerializer(products, many=True)
+        data['items_in_cart'] = serializer.data
+
+        orders = Product.objects.filter(id__in=data['orders'])
+        serializer = ProductSerializer(orders, many=True)
+        data['orders'] = serializer.data
+
         return Response(data, status=status.HTTP_200_OK)
 
 class GetAllUsers(APIView):
@@ -93,6 +101,16 @@ class BecomeTrainee(APIView):
         profile = Person.objects.get(username=profile_username)
         profile.trainees.add(request.user)
         return Response( status=status.HTTP_200_OK)
+    
+class RemoveTrainee(APIView):
+    renderer_classes = [PersonRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        profile_username = request.data.get('profile_username')
+        profile = Person.objects.get(username=profile_username)
+        profile.trainees.remove(request.user)
+        return Response(status=status.HTTP_200_OK)
 
 class UpdateProfile(APIView):
     permission_classes = [IsAuthenticated]
@@ -174,3 +192,52 @@ class SaveVideoCallURL(APIView):
         request.user.video_call_url = None
         request.user.save()
         return Response(status=status.HTTP_200_OK)
+    
+
+class AddToCart(APIView):
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [PersonRenderer]
+
+    def post(self, request, format=None):
+        product_id = request.data.get('product_id')
+        product = Product.objects.get(id=product_id)
+        request.user.items_in_cart.add(product)
+        return Response(status=status.HTTP_200_OK)  
+    
+class RemoveFromCart(APIView):
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [PersonRenderer]
+
+    def post(self, request, format=None):
+        product_id = request.data.get('product_id')
+        product = Product.objects.get(id=product_id)
+        request.user.items_in_cart.remove(product)
+        return Response(status=status.HTTP_200_OK) 
+    
+class PlaceOrder(APIView):  
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [PersonRenderer]
+
+    def post(self, request, format=None):
+        items = request.data.get('items')
+        user = request.user
+        
+        # Reduce stock quantity for each ordered item
+        for item in items:
+            product_id = item.get('id')
+            quantity = 1  # Default to 1 if quantity is not provided
+            
+            try:
+                product = Product.objects.get(id=product_id)
+                product.stock_quantity -= quantity
+                product.save()
+            except Product.DoesNotExist:
+                return Response({"error": f"Product with id {product_id} not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Add items to user's orders
+        user.orders.add(*[item['id'] for item in items])
+        
+        # Clear the user's cart
+        user.items_in_cart.clear()
+        
+        return Response({"message": "Order placed successfully"}, status=status.HTTP_200_OK)

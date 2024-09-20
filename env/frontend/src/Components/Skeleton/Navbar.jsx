@@ -202,7 +202,7 @@ export default function Navbar(props) {
                                 display: 'flex'
                             }}>
                                 <WishlistButton />
-                                <CartButton></CartButton>
+                                <Link to='/cart'><CartButton></CartButton></Link>
                                 <Tooltip title="Open settings">
                                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                         <Avatar alt="User Avatar" src={user.avatar} />

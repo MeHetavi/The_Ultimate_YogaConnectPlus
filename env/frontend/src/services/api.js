@@ -62,6 +62,18 @@ export const api = createApi({
                 }
             },
         }),
+        removeTrainee: builder.mutation({
+            query: ({ access_token, profile_username }) => {
+                return {
+                    url: 'removeTrainee/',
+                    method: 'POST',
+                    body: { profile_username },
+                    headers: {
+                        'authorization': `Bearer ${access_token}`,
+                    }
+                }
+            },
+        }),
         updateProfile: builder.mutation({
             query: ({ access_token, data }) => {
                 return {
@@ -115,9 +127,40 @@ export const api = createApi({
                 },
             }),
         }),
+        addToCart: builder.mutation({
+            query: ({ access_token, product_id }) => ({
+                url: 'addToCart/',
+                method: 'POST',
+                body: { product_id },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                    'Content-type': 'application/json',
+                },
+            }),
+        }),
+        removeFromCart: builder.mutation({
+            query: ({ access_token, product_id }) => ({
+                url: 'removeFromCart/',
+                method: 'POST',
+                body: { product_id },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                    'Content-type': 'application/json',
+                },
+            }),
+        }),
+        placeOrder: builder.mutation({
+            query: ({ access_token, items }) => ({
+                url: 'placeOrder/',
+                method: 'POST',
+                body: { items },
+                headers: {
+                    'authorization': `Bearer ${access_token}`,
+                },
+            }),
+        }),
+    }),
 
-
-    })
 })
 
 export const {
@@ -126,9 +169,13 @@ export const {
     useGetLoggedUserQuery,
     useGetUsersQuery,
     useBecomeTraineeMutation,
+    useRemoveTraineeMutation,
     useUpdateProfileMutation,
     useGetProductsByCategoryQuery,
     useChangePasswordMutation,
     useSaveVideoCallURLMutation,
     useUnsaveVideoCallURLMutation,
+    useAddToCartMutation,
+    useRemoveFromCartMutation,
+    usePlaceOrderMutation,
 } = api

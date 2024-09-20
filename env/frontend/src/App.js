@@ -19,8 +19,6 @@ import Wishlist from './pages/Shop/Wishlist';
 import VideoCall from './pages/Dashbard/VideoCall';
 import LeftNavbar from './Components/Skeleton/LeftNavbar';
 
-
-
 function App() {
   const user = useSelector((state) => state.user);
 
@@ -69,6 +67,7 @@ function App() {
           <Route path="/videoCall" element={<VideoCall />} />
           <Route path="/cart" element={<ProtectedRoute element={<Cart />} />} />
           <Route path="/wishlist" element={<ProtectedRoute element={<Wishlist />} />} />
+          <Route path='/cart' element={<ProtectedRoute element={<Cart />} />} />
 
           {/* 404 Route */}
           <Route path="/404" element={<NotFound />} />

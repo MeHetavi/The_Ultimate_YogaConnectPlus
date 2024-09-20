@@ -13,7 +13,6 @@ const FlipCardSide = styled(Box)(({ theme }) => ({
     gap: '20px',
     borderRadius: '5px',
     border: `2px solid var(--main-color)`,
-    boxShadow: `4px 4px var(--main-color)`,
 }));
 
 export default FlipCardSide;

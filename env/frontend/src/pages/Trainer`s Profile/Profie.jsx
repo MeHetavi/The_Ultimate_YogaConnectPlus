@@ -5,11 +5,11 @@ import Grid from '@mui/material/Grid2';
 import { useSelector } from 'react-redux';
 import { styled } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useBecomeTraineeMutation } from '../../services/api';
+import { useBecomeTraineeMutation, useRemoveTraineeMutation } from '../../services/api';
 import { getToken } from '../../services/localStorage';
 import { useDispatch } from 'react-redux';
 import { setUserInfo } from '../../features/userSlice';
-import SubscribeButton from '../../Components/Button'; // Import the custom Button component
+import SubscribeButton from '../../Components/Button';
 import { Modal, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link as RouterLink } from 'react-router-dom';
@@ -24,7 +24,8 @@ const Dashboard = () => {
     const { users } = useSelector((state) => state.allUsersData);
     const [profile, setProfile] = useState('');
     const [is_trainee, setIsTrainee] = useState(false);
-    const [becomeTrainee, { isLoading, error }] = useBecomeTraineeMutation();
+    const [becomeTrainee, { isLoading: isBecomingTrainee }] = useBecomeTraineeMutation();
+    const [removeTrainee, { isLoading: isRemovingTrainee }] = useRemoveTraineeMutation();
     const theme = useTheme();
     const user = useSelector((state) => state.user);
     const dispatch = useDispatch();
@@ -49,16 +50,13 @@ const Dashboard = () => {
                     .unwrap()
                     .then((response) => {
                         setIsTrainee(true);
-                        // Update the profile state
                         setProfile(prevProfile => ({
                             ...prevProfile,
                             trainees: [...prevProfile.trainees, user.username]
                         }));
-                        // Update the foundUser object
                         if (foundUser) {
                             foundUser.trainees = [...foundUser.trainees, user.username];
                         }
-                        // Update the user state in Redux
                         dispatch(setUserInfo({
                             ...user,
                             trainers: [...user.trainers, profile.username]
@@ -66,6 +64,33 @@ const Dashboard = () => {
                     })
                     .catch((err) => {
                         console.error('Error becoming trainee:', err);
+                    });
+            }
+        }
+    };
+
+    const handleRemoveTrainee = () => {
+        if (is_trainee) {
+            const access_token = getToken().access_token;
+            if (profile) {
+                removeTrainee({ access_token, profile_username: profile.username })
+                    .unwrap()
+                    .then((response) => {
+                        setIsTrainee(false);
+                        setProfile(prevProfile => ({
+                            ...prevProfile,
+                            trainees: prevProfile.trainees.filter(trainee => trainee !== user.username)
+                        }));
+                        if (foundUser) {
+                            foundUser.trainees = foundUser.trainees.filter(trainee => trainee !== user.username);
+                        }
+                        dispatch(setUserInfo({
+                            ...user,
+                            trainers: user.trainers.filter(trainer => trainer !== profile.username)
+                        }));
+                    })
+                    .catch((err) => {
+                        console.error('Error removing trainee:', err);
                     });
             }
         }
@@ -132,12 +157,21 @@ const Dashboard = () => {
                             <Typography variant="body1" sx={{ mb: 3, textAlign: 'center' }}>{profile.description}</Typography>
 
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
-                                <SubscribeButton
-                                    onClick={handleBecomeTrainee}
-                                    disabled={isLoading || is_trainee}
-                                >
-                                    {is_trainee ? 'Already a Trainee' : 'Become Trainee'}
-                                </SubscribeButton>
+                                {is_trainee ? (
+                                    <SubscribeButton
+                                        onClick={handleRemoveTrainee}
+                                        disabled={isRemovingTrainee}
+                                    >
+                                        {isRemovingTrainee ? 'Removing...' : 'Remove from Trainees'}
+                                    </SubscribeButton>
+                                ) : (
+                                    <SubscribeButton
+                                        onClick={handleBecomeTrainee}
+                                        disabled={isBecomingTrainee}
+                                    >
+                                        {isBecomingTrainee ? 'Becoming Trainee...' : 'Become Trainee'}
+                                    </SubscribeButton>
+                                )}
                                 {is_trainee && profile.video_call_url && (
                                     <SubscribeButton
                                         onClick={() => window.open(profile.video_call_url, '_blank')}
@@ -146,7 +180,6 @@ const Dashboard = () => {
                                     </SubscribeButton>
                                 )}
                             </Box>
-                            {error && <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>{error.message}</Typography>}
                         </Box>
                     </CardContent>
                 </Card>

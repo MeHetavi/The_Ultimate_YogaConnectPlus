@@ -6,18 +6,28 @@ import Box2 from "../../Components/Home/Box2";
 import Box3 from "../../Components/Home/Box3";
 import Footer from "../../Components/Skeleton/Footer";
 import Box4 from "../../Components/Home/Box4";
-import Box5 from '../../Components/Home/Box5';
-import Box6 from '../../Components/Home/Box6';
-import Box7 from '../../Components/Home/Box7';
-import Box8 from '../../Components/Home/Box8';
 import { useGetLoggedUserQuery } from "../../services/api.js";
 import { useDispatch } from "react-redux";
 import { setUserInfo } from '../../features/userSlice.js';
 import { getToken } from '../../services/localStorage.js';
 import { useGetUsersQuery } from '../../services/api.js';
-import { useSelector } from 'react-redux';
 import { setAllUsersSlice } from '../../features/allUsersSlice.js';
 import { getFullAvatarPath } from '../../services/localStorage.js';
+import { motion, useScroll, useTransform } from 'framer-motion';
+
+const AnimatedWord = ({ children, range }) => {
+    const { scrollYProgress } = useScroll();
+    const opacity = useTransform(scrollYProgress, range, [0, 1]);
+    const y = useTransform(scrollYProgress, range, [15, 0]); // Reduced vertical movement
+
+    return (
+        <motion.span
+            style={{ opacity, y, display: 'inline-block', marginRight: '0.25em' }}
+        >
+            {children}
+        </motion.span>
+    );
+};
 
 export default function Home() {
     const { access_token, refresh_token } = getToken();
@@ -64,6 +74,8 @@ export default function Home() {
                 avatar: data.avatar,
                 trainers: data.trainers,
                 description: data.description,
+                items_in_cart: data.items_in_cart,
+                orders: data.orders
             }))
         }
     }, [data, access_token])
@@ -73,6 +85,16 @@ export default function Home() {
 
         }
     }, [allUsersData])
+
+    console.log(data)
+
+    const text = "At YC+, we're dedicated to enhancing your yoga practice with premium, eco-friendly products. Our mission is to offer top-quality gear and apparel that support your wellness journey while promoting sustainability.";
+    const words = text.split(' ');
+    const totalWords = words.length;
+
+    // Adjust these values to control the speed of the animation
+    const startScroll = 0.1;  // Start animation at 10% of scroll
+    const endScroll = 0.25;    // End animation at 25% of scroll
 
     return (
         <>
@@ -132,79 +154,35 @@ export default function Home() {
                 sx={{
                     margin: '40px',
                     marginTop: '10vh',
+                    minHeight: '100vh', // Further reduced height for faster scrolling
                 }}
             >
                 <Typography
-                    variant="h3" sx={{
+                    variant="h3"
+                    sx={{
                         fontWeight: '300',
                         color: '#323232',
                         fontFamily: "Montserrat",
                         width: '65vw',
-                    }}>
-                    At YC+, we`re dedicated to enhancing your yoga practice with premium, eco-friendly products. Our mission is to offer top-quality gear and apparel that support your wellness journey while promoting sustainability.
-                </Typography>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        width: 'inherit'
                     }}
                 >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            height: '40vh',
-                            width: '65vw',
-                            margin: '10px',
-                        }}>
-                        <Box5 />
-                    </Box>
-
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            height: '90vh',
-                            width: '30vw',
-                            margin: '10px',
-                        }}>
-                        <Box6 />
-                    </Box>
-                </Box>
-            </Box>
-
-            <Box
-                sx={{
-                    height: '70vh',
-                    margin: '20px',
-                    position: 'relative',
-                    top: '-50vh',
-                    display: 'flex'
-                }}>
-
-                <Box
-                    sx={{
-                        height: '41.3vh',
-                        width: '39vw',
-                        margin: '10px',
-                        // marginLeft: '2vw'
-                    }}>
-                    <Box7 />
-                </Box>
-                <Box
-                    sx={{
-                        height: '41.3vh',
-                        width: '25vw',
-                        margin: '10px',
-                    }}>
-                    <Box8 />
-
-                </Box>
-            </Box>
+                    {words.map((word, index) => (
+                        <AnimatedWord
+                            key={index}
+                            range={[
+                                startScroll + (index / totalWords) * (endScroll - startScroll),
+                                startScroll + ((index + 1) / totalWords) * (endScroll - startScroll)
+                            ]}
+                        >
+                            {word}
+                        </AnimatedWord>
+                    ))}
+                </Typography>
+            </Box >
 
             <Box
                 sx={{
                     position: 'relative',
-                    top: '-60vh',
                     display: 'flex',
                     justifyContent: 'center',
                 }}

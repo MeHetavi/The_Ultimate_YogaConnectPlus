@@ -8,7 +8,8 @@ import ProductCard from '../../Components/Shop/ProductCard';
 import { useGetProductsByCategoryQuery } from '../../services/api';
 
 export default function ShopByGenere() {
-    const { genere } = useParams();
+    let { genere } = useParams();
+    genere == 'storage&maintanance' ? genere = 'Storage & Maintenance' : genere = genere
     const { data, isLoading, error } = useGetProductsByCategoryQuery(genere);
 
     if (isLoading) {
