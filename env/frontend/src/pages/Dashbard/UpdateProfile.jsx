@@ -1,18 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, Typography, Card, CardContent, TextField, Avatar, ThemeProvider, createTheme, styled, Modal } from '@mui/material';
+import { Box, Typography, Card, CardContent, TextField, Avatar, ThemeProvider, createTheme, styled, Modal, Alert, Snackbar } from '@mui/material';
 import Cropper from 'react-easy-crop';
 import Navbar from '../../Components/Skeleton/Navbar';
 import Grid from '@mui/material/Grid2';
 import LeftNavbar from '../../Components/Skeleton/LeftNavbar';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useUpdateProfileMutation } from '../../services/api';
-import { getToken } from '../../services/localStorage';
-import { useDispatch } from 'react-redux';
+import { getToken, getFullAvatarPath } from '../../services/localStorage';
 import { setUserInfo } from '../../features/userSlice';
-import { getFullAvatarPath } from '../../services/localStorage';
 import { useMediaQuery } from '@mui/material';
 import SubscribeButton from '../../Components/Button';
-import profile_picture from '../../Components/Images/Home1.jpg';
+
 // Create a theme
 const theme = createTheme({
     typography: {
@@ -98,6 +96,7 @@ const UpdateProfile = (props) => {
     const [isCropping, setIsCropping] = useState(false);
     const [errors, setErrors] = useState({});
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const [alert, setAlert] = useState({ open: false, message: '', severity: 'success' });
 
     useEffect(() => {
         if (data.username !== '') {
@@ -181,21 +180,6 @@ const UpdateProfile = (props) => {
         }
     }, [croppedAreaPixels]);
 
-    // const handleRemoveAvatar = async () => {
-    //     try {
-    //         const formData = new FormData();
-    //         const blob = await response.blob();
-    //         formData.append('avatar', profile_picture);
-
-    //         const result = await updateUser({ access_token, data: formData }).unwrap();
-    //         dispatch(setUserInfo(result));
-    //         setUser(result);
-    //         setEditedUser(result);
-    //         setAvatar(null);
-    //     } catch (error) {
-    //         console.error('Failed to remove avatar:', error);
-    //     }
-    // };
     const handleUpdate = async () => {
         try {
             const formData = new FormData();
@@ -215,19 +199,23 @@ const UpdateProfile = (props) => {
 
             const result = await updateUser({ access_token, data: formData }).unwrap();
 
-            dispatch(setUserInfo({ ...result, trainers: data.trainers, trainees: data.trainees, is_trainer: data.is_trainer }));
+            setAlert({ open: true, message: 'Profile updated successfully!', severity: 'success' });
 
-            setUser(result);
-            setEditedUser(result);
-            setIsEditing(false);
-            setAvatar(null);
-            setErrors({});
+            setTimeout(() => {
+                dispatch(setUserInfo({ ...result, ...user }));
+                setUser(result);
+                setEditedUser(result);
+                setIsEditing(false);
+                setAvatar(null);
+                setErrors({});
+            }, 1000);
         } catch (error) {
             console.error('Failed to update user:', error);
             console.error('Error response:', error.data);
             if (error.data && typeof error.data === 'object') {
                 setErrors(error.data.errors);
             }
+            setAlert({ open: true, message: 'Failed to update profile. Please try again.', severity: 'error' });
         }
     };
 
@@ -238,7 +226,12 @@ const UpdateProfile = (props) => {
         setErrors({});
     };
 
-
+    const handleCloseAlert = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setAlert({ ...alert, open: false });
+    };
 
     return (
         access_token ?
@@ -286,11 +279,6 @@ const UpdateProfile = (props) => {
                                                             onChange={handleAvatarChange}
                                                         />
                                                     </SubscribeButton>
-                                                    {/* <SubscribeButton
-                                                        onClick={handleRemoveAvatar}
-                                                    >
-                                                        Remove Avatar
-                                                    </SubscribeButton> */}
                                                 </>
                                             )}
                                         </Box>
@@ -391,6 +379,17 @@ const UpdateProfile = (props) => {
                         <SubscribeButton onClick={handleCropSave}>Save</SubscribeButton>
                     </Box>
                 </Modal>
+
+                <Snackbar
+                    open={alert.open}
+                    autoHideDuration={6000}
+                    onClose={handleCloseAlert}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                >
+                    <Alert onClose={handleCloseAlert} severity={alert.severity} sx={{ width: '100%' }}>
+                        {alert.message}
+                    </Alert>
+                </Snackbar>
             </ThemeProvider >
             :
             <h1>404 Not Found</h1>

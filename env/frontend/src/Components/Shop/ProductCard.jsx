@@ -101,7 +101,7 @@ const CartButton = styled(Button)(({ theme }) => ({
     height: '40px',
     borderRadius: '12px',
     border: 'none',
-    backgroundColor: 'rgb(0, 150, 0)',
+    backgroundColor: 'rgb(33, 76, 89)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -141,7 +141,7 @@ const IconContainer = styled(Box)(({ theme }) => ({
 }));
 
 const CartIcon = styled(SvgIcon)({
-    fill: 'rgb(17, 17, 17)',
+    fill: 'rgb(172, 214, 226)',
 });
 
 const CartText = styled(Typography)({
@@ -149,7 +149,7 @@ const CartText = styled(Typography)({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'rgb(17, 17, 17)',
+    color: 'rgb(226,226,226)',
     zIndex: 1,
     transitionDuration: '0.5s',
     fontWeight: '800',
@@ -225,7 +225,7 @@ const ProductCard = ({ product }) => {
                     display: 'flex',
                     justifyContent: 'center',
                     height: 100,
-                    backgroundColor: '#228b22',
+                    backgroundColor: 'rgb(33, 76, 89)',
                     borderRadius: '5px',
                     border: '2px solid black',
                     transition: 'all 0.5s',

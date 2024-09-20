@@ -23,7 +23,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const { users } = useSelector((state) => state.allUsersData);
     const [profile, setProfile] = useState('');
-    const [is_trainee, setIsTrainee] = useState(false);
+    const [isTrainee, setIsTrainee] = useState(false);
     const [becomeTrainee, { isLoading: isBecomingTrainee }] = useBecomeTraineeMutation();
     const [removeTrainee, { isLoading: isRemovingTrainee }] = useRemoveTraineeMutation();
     const theme = useTheme();
@@ -43,13 +43,19 @@ const Dashboard = () => {
     }, [username, users, user]);
 
     const handleBecomeTrainee = () => {
-        if (!is_trainee) {
+
+        if (!isTrainee) {
+
             const access_token = getToken().access_token;
+
             if (profile) {
+
                 becomeTrainee({ access_token, profile_username: profile.username })
                     .unwrap()
                     .then((response) => {
+
                         setIsTrainee(true);
+
                         setProfile(prevProfile => ({
                             ...prevProfile,
                             trainees: [...prevProfile.trainees, user.username]
@@ -70,13 +76,17 @@ const Dashboard = () => {
     };
 
     const handleRemoveTrainee = () => {
-        if (is_trainee) {
+        if (isTrainee) {
+
             const access_token = getToken().access_token;
+
             if (profile) {
                 removeTrainee({ access_token, profile_username: profile.username })
                     .unwrap()
                     .then((response) => {
+
                         setIsTrainee(false);
+
                         setProfile(prevProfile => ({
                             ...prevProfile,
                             trainees: prevProfile.trainees.filter(trainee => trainee !== user.username)
@@ -157,12 +167,12 @@ const Dashboard = () => {
                             <Typography variant="body1" sx={{ mb: 3, textAlign: 'center' }}>{profile.description}</Typography>
 
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
-                                {is_trainee ? (
+                                {isTrainee ? (
                                     <SubscribeButton
                                         onClick={handleRemoveTrainee}
                                         disabled={isRemovingTrainee}
                                     >
-                                        {isRemovingTrainee ? 'Removing...' : 'Remove from Trainees'}
+                                        {isRemovingTrainee ? 'Removing...' : 'Remove Trainer'}
                                     </SubscribeButton>
                                 ) : (
                                     <SubscribeButton
@@ -172,7 +182,7 @@ const Dashboard = () => {
                                         {isBecomingTrainee ? 'Becoming Trainee...' : 'Become Trainee'}
                                     </SubscribeButton>
                                 )}
-                                {is_trainee && profile.video_call_url && (
+                                {isTrainee && profile.video_call_url && (
                                     <SubscribeButton
                                         onClick={() => window.open(profile.video_call_url, '_blank')}
                                     >

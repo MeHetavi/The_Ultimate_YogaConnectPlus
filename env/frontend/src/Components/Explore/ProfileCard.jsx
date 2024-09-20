@@ -10,13 +10,12 @@ const ProfileCard = ({ profile }) => {
     return (
         <Box
             sx={{
-                backgroundColor: "#96c9d9",
+                backgroundColor: "rgb(172, 214, 226)",
                 margin: { xs: '5px', sm: '8px', md: '10px' },
                 width: { xs: '90%', sm: '85%', md: '80%' },
                 maxWidth: '300px',
                 padding: { xs: '15px', sm: '20px', md: '25px' },
-                border: "4px solid #acd6e2",
-                boxShadow: "0 6px 10px rgba(207, 212, 222, 1)",
+                border: "2px solid rgb(20, 50, 95)",
                 borderRadius: "10px",
                 textAlign: "center",
                 color: "#fff",
@@ -36,7 +35,7 @@ const ProfileCard = ({ profile }) => {
                 sx={{
                     width: { xs: '4rem', sm: '4.5rem', md: '5rem' },
                     height: { xs: '4rem', sm: '4.5rem', md: '5rem' },
-                    border: "4px solid #acd6e2",
+                    border: "2px solid rgb(20, 50, 95)",
                     marginBottom: '10px',
                 }}
                 src={profile.avatar}
@@ -62,7 +61,7 @@ const ProfileCard = ({ profile }) => {
             >
                 <Link
                     to={`profile/${profile.username}`}
-                    style={{ color: '#fff', textDecoration: 'none' }}
+                    style={{ color: '#000', textDecoration: 'none', fontFamily: 'Montserrat', fontWeight: '500' }}
                 >
                     {profile.username}
                 </Link>
@@ -83,8 +82,9 @@ const ProfileCard = ({ profile }) => {
                     variant="body2"
                     sx={{
                         fontSize: { xs: '12px', sm: '13px', md: '14px' },
-                        color: '#f0f0f0',
+                        color: '#000',
                         mt: '10px',
+                        fontFamily: 'Montserrat',
                     }}
                 >
                     {profile.description ? (

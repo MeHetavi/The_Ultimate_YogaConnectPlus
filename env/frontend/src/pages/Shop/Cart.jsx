@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Box, Card, CardContent, Typography, Divider, IconButton } from '@mui/material';
+import { Box, Card, CardContent, Typography, Divider, IconButton, Alert, Snackbar } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Navbar from '../../Components/Skeleton/Navbar';
 import SubscribeButton from '../../Components/Button';
-import { useState } from 'react';
 import { useRemoveFromCartMutation } from '../../services/api';
 import { getToken } from '../../services/localStorage';
 import { setUserInfo } from '../../features/userSlice';
@@ -57,6 +56,7 @@ export default function Cart() {
     const [cartItems, setCartItems] = useState(user.items_in_cart)
     const [removeFromCartMutation] = useRemoveFromCartMutation();
     const [placeOrderMutation] = usePlaceOrderMutation();
+    const [openAlert, setOpenAlert] = useState(false);
 
     const handleRemoveItem = async (productId) => {
         const { access_token } = getToken();
@@ -68,22 +68,32 @@ export default function Cart() {
 
     const handlePlaceOrder = async () => {
         const { access_token, refresh_token } = getToken();
-        placeOrderMutation({ access_token, items: cartItems });
-        cartItems.map((item) => {
+        await placeOrderMutation({ access_token, items: cartItems });
+        cartItems.forEach((item) => {
             removeFromCartMutation({ product_id: item.id, access_token });
-        })
-        setCartItems([])
-        dispatch(setUserInfo({ ...user, items_in_cart: [], orders: [...user.orders, ...cartItems] }))
-        console.log(user.orders)
+        });
+
+        setOpenAlert(true);
+        setTimeout(() => {
+            setCartItems([]);
+            dispatch(setUserInfo({ ...user, items_in_cart: [], orders: [...user.orders, ...cartItems] }));
+        }, 3000);
     }
+
+    const handleCloseAlert = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenAlert(false);
+    };
 
     return (
         <>
             <Navbar />
             <Box sx={{ p: 3 }}>
-                <Typography sx={{ fontFamily: 'montserrat', fontWeight: 'bold', fontSize: '2rem', mt: 4 }} variant="h4" gutterBottom>Your Cart</Typography>
+                <Typography sx={{ textAlign: 'center', fontFamily: 'montserrat', fontWeight: 'bold', fontSize: '2rem', mt: 4 }} variant="h4" gutterBottom>Your Cart</Typography>
                 {cartItems.length === 0 ? (
-                    <Typography sx={{ fontFamily: 'montserrat', fontSize: '2rem', mt: 4, display: 'flex', justifyContent: 'center', color: 'grey' }}>Your cart is empty.</Typography>
+                    <Typography sx={{ fontFamily: 'montserrat', fontSize: '2rem', mt: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'grey', fontWeight: '200', height: '40vh' }}>Your cart is empty.</Typography>
                 ) : (
                     <>
                         {cartItems.map((item) => (
@@ -96,6 +106,11 @@ export default function Cart() {
                     </>
                 )}
             </Box>
+            <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="success" sx={{ width: '100%' }}>
+                    Order placed successfully!
+                </Alert>
+            </Snackbar>
         </>
     );
 }
