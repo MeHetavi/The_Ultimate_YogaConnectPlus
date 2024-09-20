@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Category, Company, Person, Product, ProductImage
+from .models import Category, Company, Person, Product
 from django.contrib.auth.password_validation import validate_password
 
 def get_trainers(obj):
@@ -112,18 +112,13 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'slug', 'parent']
 
-class ProductImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductImage
-        fields = ['id', 'image', 'is_primary', 'alt_text']
-
 class ProductSerializer(serializers.ModelSerializer):
     company = CompanySerializer(read_only=True)
     category = CategorySerializer(read_only=True)
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'slug', 'description', 'price', 'category', 'company', 'sku', 'stock_quantity', 'is_available']
+        fields = ['id', 'name', 'slug', 'description', 'price', 'category', 'company', 'sku', 'stock_quantity', 'is_available', 'image']
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)

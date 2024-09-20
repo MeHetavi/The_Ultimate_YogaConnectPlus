@@ -83,13 +83,16 @@ export default function SignIn() {
                     <FlipCardButton type="submit">Let`s go!</FlipCardButton>
                     {serverError.non_field_errors ? <Alert severity='error'>{serverError.non_field_errors}</Alert> : ''}
                 </form>
-                <Typography
+                <Link to="/"
                     sx={{
-                        fontWeight: 700,
-                        color: 'black',
                         textDecoration: 'none',
+                        fontFamily: 'Montserrat',
+                        fontWeight: '700',
+                        color: 'black',
                     }}
-                    variant="body1" ><Link to="/" sx={{ fontWeight: 700 }}>Home</Link></Typography>
+                >
+                    Home
+                </Link>
             </FlipCardSide>
 
             <Snackbar

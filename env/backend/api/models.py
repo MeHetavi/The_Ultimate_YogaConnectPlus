@@ -85,15 +85,6 @@ class Person(AbstractBaseUser):
         "Is the user a member of staff?"
         return self.is_admin
 
-# class Product(models.Model):
-#     name = models.CharField(max_length=100)
-#     price = models.IntegerField()
-#     image = models.ImageField(upload_to='products/', null=False, blank=False)
-#     wishlistedBy = models.ManyToManyField('self',symmetrical=False, related_name='Wishlist')
-#     addedToCartBy = models.ManyToManyField('self',symmetrical=False, related_name='Cart')
-# #   colors = models.ManyToManyField('self',symmetrical=False, related_name='Colors')
-#     category = models.CharField(max_length=100)
-
 class Product(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
@@ -106,7 +97,7 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
@@ -115,14 +106,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='product_images/')
-    is_primary = models.BooleanField(default=False)
-    alt_text = models.CharField(max_length=255, blank=True)
-
-    def __str__(self):
-        return f"Image for {self.product.name}"
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

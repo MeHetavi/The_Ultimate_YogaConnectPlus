@@ -38,7 +38,7 @@ export default function Orders() {
                     {orders.map((item) => (
                         <Grid container spacing={2} sx={{ marginTop: '20px' }}>
                             <Grid item xs={4}>
-                                <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
+                                <img src={item.image} alt={item.name} style={{ width: '30%', height: 'auto' }} />
                             </Grid>
                             <Grid item xs={8}>
                                 <Typography sx={{ fontWeight: 'bold', fontFamily: 'montserrat' }} variant="h6">{item.name}</Typography>

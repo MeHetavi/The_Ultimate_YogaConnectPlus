@@ -20,7 +20,7 @@ const CartItem = ({ item, onRemove }) => (
                     </IconButton>
                 </Grid>
                 <Grid item xs={4}>
-                    <img src={item.image} alt={item.name} style={{ width: '100%', height: 'auto' }} />
+                    <img src={item.image} alt={item.name} style={{ width: '30%', height: 'auto' }} />
                 </Grid>
                 <Grid item xs={7}>
                     <Typography sx={{ fontWeight: 'bold', fontFamily: 'montserrat' }} variant="h6">{item.name}</Typography>

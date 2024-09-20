@@ -5,11 +5,11 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Person, Category, Product, ProductImage
+from .models import Person, Category, Product
 from .serializers import (
     GetAllUsersSeializer, PersonRegistrationSerializer, SignInSerializer, 
     PersonDashboardSerializer, UpdateUserProfileSerializer,
-    CategorySerializer, ProductSerializer, ProductImageSerializer,ChangePasswordSerializer
+    CategorySerializer, ProductSerializer,ChangePasswordSerializer
 )
 from django.contrib.auth import authenticate
 from .renderers import PersonRenderer
@@ -137,13 +137,15 @@ class GetAllProductsByCategory(APIView):
 
             for product in products:
                 product_serializer = ProductSerializer(product).data
-                images = ProductImage.objects.filter(product=product)
-                image_data = ProductImageSerializer(images, many=True).data
-                product_serializer['images'] = image_data
                 product_data.append(product_serializer)
+
 
             category_data['products'] = product_data
             data.append(category_data)
+            for product in data:
+                for product_data in product['products']:
+                    if product_data['image'] != None and  not product_data['image'].startswith('http'):
+                        product_data['image'] = 'http://localhost:8000'+product_data['image']
 
         return Response(data, status=status.HTTP_200_OK)
 

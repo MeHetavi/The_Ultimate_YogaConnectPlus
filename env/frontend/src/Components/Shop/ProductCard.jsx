@@ -234,13 +234,7 @@ const ProductCard = ({ product }) => {
                     },
                 }}
             >
-                {/* Add your image inside this div */}
-                <Box
-                    sx={{
-                        width: 100,
-                        height: 100,
-                    }}
-                />
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, width: '5vw' }} src={product.image} component="img"></Box>
             </CardMedia>
 
             <CardContent sx={{ padding: '0px' }}>
