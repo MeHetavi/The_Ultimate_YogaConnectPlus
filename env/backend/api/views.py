@@ -66,9 +66,17 @@ class Dashboard(APIView):
         serializer = ProductSerializer(products, many=True)
         data['items_in_cart'] = serializer.data
 
+        for product in data['items_in_cart']:
+            if product['image'] != None and  not product['image'].startswith('http'):
+                product['image'] = 'http://localhost:8000'+product['image']
+
         orders = Product.objects.filter(id__in=data['orders'])
         serializer = ProductSerializer(orders, many=True)
         data['orders'] = serializer.data
+
+        for product in data['orders']:
+            if product['image'] != None and  not product['image'].startswith('http'):
+                product['image'] = 'http://localhost:8000'+product['image']
 
         return Response(data, status=status.HTTP_200_OK)
 

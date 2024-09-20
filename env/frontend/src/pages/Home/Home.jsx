@@ -154,7 +154,6 @@ export default function Home() {
                 sx={{
                     margin: '40px',
                     marginTop: '10vh',
-                    minHeight: '100vh', // Further reduced height for faster scrolling
                 }}
             >
                 <Typography
